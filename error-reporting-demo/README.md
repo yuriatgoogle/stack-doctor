@@ -49,10 +49,7 @@ Note that the log entry is created against the "global" resource because the log
 
 I again followed the documentation to set up the Winston client:
 
-<table>
-<thead>
-<tr>
-<th><p><pre>
+```javascript
 // ************* Winston logging setup *****************
 const loggingWinston = new LoggingWinston();
 // Create a Winston logger that streams to Stackdriver Logging
@@ -64,33 +61,16 @@ const winstonLogger = winston.createLogger({
     loggingWinston,
   ],
 });
-</pre></p>
-
-</th>
-</tr>
-</thead>
-<tbody>
-</tbody>
-</table>
+```
 
 Then I logged an error:
 
-<table>
-<thead>
-<tr>
-<th><p><pre>
+```javascript
 app.get('/winston-error', (req, res) => {
     winstonLogger.error('Winston error logged');
     res.send('Winston error logged!');
 }) 
-</pre></p>
-
-</th>
-</tr>
-</thead>
-<tbody>
-</tbody>
-</table>
+```
 
 This time, the console output was much more concise:
 
@@ -98,7 +78,7 @@ This time, the console output was much more concise:
 
 Here's what I saw in the Logs Viewer:
 
-![image](https://drive.google.com/a/google.com/file/d/1vQRxZ8_9ZeRiaL30Mh6JOdvBr0SJz_s9/view?usp=drivesdk)
+![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/error-reporting-demo/images/2.png?raw=true)
 
 The severity was again set properly, but there's a lot less information in this entry.  For example, my hostname is not logged.  This may be a good choice for folks looking to reduce the amount of data that is logged while still retaining enough information to be useful.  
 
@@ -106,10 +86,7 @@ The severity was again set properly, but there's a lot less information in this 
 
 At this point, I had a good understanding of how logging errors works.  I next wanted to investigate whether using Error Reporting for this purpose would provide additional value.  First, I set up Error Reporting in the app:
 
-<table>
-<thead>
-<tr>
-<th><p><pre>
+```javascript
 //************** Stackdriver Error Reporting setup ******** */
 const errors = new ErrorReporting(
   {
@@ -121,41 +98,24 @@ const errors = new ErrorReporting(
     }
   }
 );
-</pre></p>
-
-</th>
-</tr>
-</thead>
-<tbody>
-</tbody>
-</table>
+```
 
 I then sent an error using the client:
 
-<table>
-<thead>
-<tr>
-<th><p><pre>
+```javascript
 app.get('/report-error', (req, res) => {
   res.send('Stackdriver error reported!');
   errors.report('Stackdriver error reported');
 }) 
-</pre></p>
-
-</th>
-</tr>
-</thead>
-<tbody>
-</tbody>
-</table>
+```
 
 This time, there was no output in the console AND nothing was logged to Stackdriver Logging.  I went to Error Reporting to find my error:
 
-![image](https://drive.google.com/a/google.com/file/d/1_OzLgPgnhRx6ks3J3LSCQ12l6ZeYL7Oc/view?usp=drivesdk)
+![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/error-reporting-demo/images/3.png?raw=true)
 
 When I clicked on the error, I was able to get a lot of detail:
 
-![image](https://drive.google.com/a/google.com/file/d/1N3QjIveLz4C1UYniaMQVkEaOkBmIROVC/view?usp=drivesdk)
+![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/error-reporting-demo/images/4.png?raw=true)
 
 This is great because I can see when the error started happening, I get a histogram if and when it continues to happen, and I get a full stack trace showing me exactly where in my code the error is generated - this is all incredibly valuable information that I don't get from simply logging with the ERROR severity.  
 
@@ -165,22 +125,12 @@ The tradeoff here is that this message never makes it to Stackdriver Logging.  T
 
 Next, I wanted to investigate what would happen if my app were to throw an exception and log it - how would it show up?  I used Bunyan to log an exception:
 
-<table>
-<thead>
-<tr>
-<th><p><pre>
+```javascript
 app.get('/log-exception', (req, res) => {
   res.send('exception');
   bunyanLogger.error(new Error('exception logged'));
 })
-</pre></p>
-
-</th>
-</tr>
-</thead>
-<tbody>
-</tbody>
-</table>
+```
 
 The console output contained the entire exception:
 
@@ -188,19 +138,19 @@ The console output contained the entire exception:
 
 The logging entry looked like this:
 
-![image](https://drive.google.com/a/google.com/file/d/1AIrJNWdIhHiXizyWX02DrCobud7X2_x0/view?usp=drivesdk)
+![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/error-reporting-demo/images/5.png?raw=true)
 
 And the jsonPayload contained the exception:
 
-![image](https://drive.google.com/a/google.com/file/d/1Oxn5NZRFHiZAyGoYOac_5njIHCk5itD8/view?usp=drivesdk)
+![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/error-reporting-demo/images/6.png?raw=true)
 
 This is definitely a lot of useful data.  I next wanted to see if Error Reporting would work as [advertised](https://cloud.google.com/error-reporting/docs/setup/nodejs) and identify this exception in the log as an error.  After carefully reviewing the documentation, I realized that this functionality works specifically on GCE, GKE, App Engine, and Cloud Functions, whereas I was just running my code on my local desktop. I tried running the code in Cloud Shell and immediately got a new entry in Error Reporting:
 
-![image](https://drive.google.com/a/google.com/file/d/1Cu6tHnmQ6hwfD_SBuFyrtLUPReJ4hDTz/view?usp=drivesdk)
+![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/error-reporting-demo/images/7.png?raw=true)
 
 The full stack trace of the exception is available in the detail view:
 
-![image](https://drive.google.com/a/google.com/file/d/1PBfGyThXZ1FR5QdK9ZyGslhXN_BunXbS/view?usp=drivesdk)
+![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/error-reporting-demo/images/8.png?raw=true)
 
 So, logging an exception gives me the best of **both** worlds - I get a logging entry that I can use for things like log based metrics, and I get an entry in Error Reporting that I can use for analysis and tracking.
 
@@ -208,30 +158,20 @@ So, logging an exception gives me the best of **both** worlds - I get a logging 
 
 I next wanted to see what would happen if I used Error Reporting to report the same exception.  
 
-<table>
-<thead>
-<tr>
-<th><p><pre>
+```javascript
 app.get('/report-exception', (req, res) => {
   res.send('exception');
   errors.report(new Error('exception reported'));
 })
-</pre></p>
-
-</th>
-</tr>
-</thead>
-<tbody>
-</tbody>
-</table>
+```
 
 Once again, there was no console output.  My error was immediately visible in Error Reporting:
 
-![image](https://drive.google.com/a/google.com/file/d/1xBurUDLWjevr_kTf1Z9oIHAsVoNYHHbx/view?usp=drivesdk)
+![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/error-reporting-demo/images/9.png?raw=true)
 
 And somewhat to my surprise, I was able to see an entry in Logging, as well:
 
-![image](https://drive.google.com/a/google.com/file/d/1JQuT-26JHzJsZU7p5Jnw0yUNHBgjm86w/view?usp=drivesdk)
+![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/error-reporting-demo/images/10.png?raw=true)
 
 As it turns out, exceptions are recorded in both Error Reporting AND Logging - no matter which of the two you use to send them.
 
