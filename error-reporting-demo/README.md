@@ -111,11 +111,11 @@ app.get('/report-error', (req, res) => {
 
 This time, there was no output in the console AND nothing was logged to Stackdriver Logging.  I went to Error Reporting to find my error:
 
-![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/error-reporting-demo/images/3.png?raw=true)
+![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/error-reporting-demo/images/4.png?raw=true)
 
 When I clicked on the error, I was able to get a lot of detail:
 
-![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/error-reporting-demo/images/4.png?raw=true)
+![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/error-reporting-demo/images/5.png?raw=true)
 
 This is great because I can see when the error started happening, I get a histogram if and when it continues to happen, and I get a full stack trace showing me exactly where in my code the error is generated - this is all incredibly valuable information that I don't get from simply logging with the ERROR severity.  
 
@@ -138,19 +138,19 @@ The console output contained the entire exception:
 
 The logging entry looked like this:
 
-![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/error-reporting-demo/images/5.png?raw=true)
+![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/error-reporting-demo/images/6.png?raw=true)
 
 And the jsonPayload contained the exception:
 
-![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/error-reporting-demo/images/6.png?raw=true)
+![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/error-reporting-demo/images/7.png?raw=true)
 
 This is definitely a lot of useful data.  I next wanted to see if Error Reporting would work as [advertised](https://cloud.google.com/error-reporting/docs/setup/nodejs) and identify this exception in the log as an error.  After carefully reviewing the documentation, I realized that this functionality works specifically on GCE, GKE, App Engine, and Cloud Functions, whereas I was just running my code on my local desktop. I tried running the code in Cloud Shell and immediately got a new entry in Error Reporting:
 
-![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/error-reporting-demo/images/7.png?raw=true)
+![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/error-reporting-demo/images/8.png?raw=true)
 
 The full stack trace of the exception is available in the detail view:
 
-![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/error-reporting-demo/images/8.png?raw=true)
+![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/error-reporting-demo/images/9.png?raw=true)
 
 So, logging an exception gives me the best of **both** worlds - I get a logging entry that I can use for things like log based metrics, and I get an entry in Error Reporting that I can use for analysis and tracking.
 
@@ -167,11 +167,11 @@ app.get('/report-exception', (req, res) => {
 
 Once again, there was no console output.  My error was immediately visible in Error Reporting:
 
-![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/error-reporting-demo/images/9.png?raw=true)
+![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/error-reporting-demo/images/10.png?raw=true)
 
 And somewhat to my surprise, I was able to see an entry in Logging, as well:
 
-![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/error-reporting-demo/images/10.png?raw=true)
+![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/error-reporting-demo/images/11.png?raw=true)
 
 As it turns out, exceptions are recorded in both Error Reporting AND Logging - no matter which of the two you use to send them.
 
