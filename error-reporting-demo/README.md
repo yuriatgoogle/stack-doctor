@@ -41,7 +41,7 @@ When I ran my app, I saw this  logging output in the console:
 
 And this in Stackdriver Logging:
 
-![image](https://drive.google.com/a/google.com/file/d/1o0nMvifUK608MjDz2h6Y546K8LYDdg_5/view?usp=drivesdk)
+![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/error-reporting-demo/images/1.png?raw=true)
 
 Note that the log entry is created against the "global" resource because the log entry is being sent from my local machine not running on GCP, and the logName is bunyan_log.  The output is nicely structured, and the severity is set to ERROR.  
 
