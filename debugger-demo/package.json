@@ -1,0 +1,25 @@
+{
+  "name": "debugger-demo",
+  "version": "1.0.0",
+  "description": "Debugger demo for Stack Doctor",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yuriatgoogle/stack-doctor.git"
+  },
+  "author": "Yuri Grinshteyn (thegrinch@google.com)",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/yuriatgoogle/stack-doctor/issues"
+  },
+  "homepage": "https://github.com/yuriatgoogle/stack-doctor#readme",
+  "dependencies": {
+    "@google-cloud/debug-agent": "^4.1.0",
+    "@google-cloud/logging-bunyan": "^2.0.0",
+    "bunyan": "^1.8.12",
+    "express": "^4.17.1"
+  }
+}
