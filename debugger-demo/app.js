@@ -7,6 +7,7 @@ const serviceVersion = "1.0"
 
 require('@google-cloud/debug-agent').start({
     projectId: projectID,
+    keyFilename: './key.json',
     serviceContext: {
       service: serviceName,
       version: serviceVersion
