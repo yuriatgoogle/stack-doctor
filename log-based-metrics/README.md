@@ -34,37 +34,37 @@ The term "log-based metrics" is rather specific to Stackdriver, but the idea is 
 
 Let's take a look at a simple example.  I've created a simple [example](https://github.com/yuriatgoogle/logbasedmetrics/blob/master/errors.js) that writes an error 20% of the time.  When I run the code locally after authenticating through the Google Cloud SDK, here are the log entries:
 
-![image](https://github.com/yuriatgoogle/logbasedmetrics/blob/master/images/2-%20matching%20error%20entries.png?raw=true)
+![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/log-based-metrics/images/2-%20matching%20error%20entries.png?raw=true)
 
 From here, I'd like to know when my error rate exceeds a particular threshold.  First, I need to create a filter for all the logs that contain the error.  An easy way is to expand the log, find the message I'd like to key on in the payload, click it, and select show matching entries.
 
-![image](https://github.com/yuriatgoogle/logbasedmetrics/blob/master/images/3-%20matching%20error%20logs.png?raw=true)
+![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/log-based-metrics/images/3-%20matching%20error%20logs.png?raw=true)
 
 This creates an Advanced Filter and shows me the failure messages:
 
-![image](https://github.com/yuriatgoogle/logbasedmetrics/blob/master/images/4%20-%20failure%20filter.png?raw=true)
+![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/log-based-metrics/images/4%20-%20failure%20filter.png?raw=true)
 
 Next, I can use the Create Metric feature to create a Counter Metric:
 
-![image](https://github.com/yuriatgoogle/logbasedmetrics/blob/master/images/5%20-%20counter%20metric%20config.png?raw=true)
+![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/log-based-metrics/images/5%20-%20counter%20metric%20config.png?raw=true)
 
 Once I click Create Metric, I can then go to Stackdriver Monitoring and see it there:
 
-![image](https://github.com/yuriatgoogle/logbasedmetrics/blob/master/images/6%20-%20counter%20metric%20in%20explorer.png?raw=true)
+![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/log-based-metrics/images/6%20-%20counter%20metric%20in%20explorer.png?raw=true)
 
 ## Distribution metric - latency
 
 Now that you've seen how to create a simple counter metric that will track the number of errors per minute, let's take a look at the other reason we might want to use log-based metrics - to track a specific numeric value in the log payload.  I've created a second [example](https://github.com/yuriatgoogle/logbasedmetrics/blob/master/latency.js) - this time, I'm introducing a randomly generated delay in the code and logging it as the latency.  Here's what the payload looks like:
 
-![image](https://github.com/yuriatgoogle/logbasedmetrics/blob/master/images/7%20-%20latency%20payload.png?raw=true)
+![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/log-based-metrics/images/7%20-%20latency%20payload.png?raw=true)
 
 I want to create a metric that will capture value in the "message" field.  To do that, I again use the "Show matching entries" feature and create a metric from the selection.  I need to use a regular expression to parse the field and extract the numeric value. **Note** that I modified the selection filter to look for all the messages coming from my local machine, where the Node.js code is running, by using the logName filter. 
 
-![image](https://github.com/yuriatgoogle/logbasedmetrics/blob/master/images/8%20-%20latency%20metric%20config.png?raw=true)
+![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/log-based-metrics/images/8%20-%20latency%20metric%20config.png?raw=true)
 
 As before, I create the metric and view it in Metrics Explorer:
 
-![image](https://github.com/yuriatgoogle/logbasedmetrics/blob/master/images/9%20-%20latency%20metric%20in%20explorer.png?raw=true)
+![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/log-based-metrics/images/9%20-%20latency%20metric%20in%20explorer.png?raw=true)
 
 # Using metrics
 
@@ -74,25 +74,25 @@ Now that we have our metrics created, we can use them just like any other metric
 
 As an example, I created a chart for the latency I'm writing as a log value:
 
-![image](https://github.com/yuriatgoogle/logbasedmetrics/blob/master/images/10%20-%20latency%20in%20dashboard.png?raw=true)
+![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/log-based-metrics/images/10%20-%20latency%20in%20dashboard.png?raw=true)
 
 One great thing about log-based metrics is that you can easily see the logs that feed them.  Click on the 3 dot menu for the chart and select View Logs:
 
-![image](https://github.com/yuriatgoogle/logbasedmetrics/blob/master/images/11%20-%20view%20latency%20logs.png?raw=true)
+![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/log-based-metrics/images/11%20-%20view%20latency%20logs.png?raw=true)
 
 The result is an advanced filter that shows you the logs that were ingested within the timeframe that the chart or dashboard were set to select:
 
-![image](https://github.com/yuriatgoogle/logbasedmetrics/blob/master/images/12%20-%20logs%20with%20time%20filter.png?raw=true)
+![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/log-based-metrics/images/12%20-%20logs%20with%20time%20filter.png?raw=true)
 
 ## Alerts
 
 To address the original question raised at the start - we can also use our metrics as the basis for alerts.  For example, if we wanted to know when our error rate exceeded a specific threshold, we can simply use our error metric in an alerting policy condition:
 
-![image](https://github.com/yuriatgoogle/logbasedmetrics/blob/master/images/13%20-%20alerting%20policy%20config.png?raw=true)
+![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/log-based-metrics/images/13%20-%20alerting%20policy%20config.png?raw=true)
 
 We can do the same for our distribution metric that captures latency:
 
-![image](https://github.com/yuriatgoogle/logbasedmetrics/blob/master/images/14%20-%20latency%20alerting%20config.png?raw=true)
+![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/log-based-metrics/images/14%20-%20latency%20alerting%20config.png?raw=true)
 
 **Note** that until a week or so ago, the documentation stated that alerting is not supported for distribution metrics - this is not true, and you can alert on distribution metrics by using a percentile aligner (with thanks to [Summit](https://twitter.com/summitraj) for catching the documentation error). 
 
