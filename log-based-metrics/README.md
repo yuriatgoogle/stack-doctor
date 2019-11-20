@@ -13,7 +13,7 @@ Note that a lot of this information is already covered in the [documentation](ht
 
 Before we start, it's important to have a common understanding of exactly what we mean when we talk about logs and metrics.  Together, they are two of the three pillars (with traces being the third) of observability.
 
-![image](https://github.com/yuriatgoogle/logbasedmetrics/blob/master/images/1%20-%20charity%20tweet.png?raw=true)
+![image](https://github.com/yuriatgoogle/stack-doctor/logbasedmetrics/blob/master/images/1%20-%20charity%20tweet.png?raw=true)
 
 **Note** that I am generally referring to "observability 1.0" here.  I will readily defer to folks like [Charity Majors](https://twitter.com/mipsytipsy) and [Liz Fong-Jones](https://twitter.com/lizthegrey) on the **current** state of the art where observability is concerned.  You can start with reading Charity's retrospective [here](https://thenewstack.io/observability-a-3-year-retrospective/), and [Ben Sigelman](https://twitter.com/el_bhs)'s addressing the idea of the three pillars directly [here](https://lightstep.com/blog/three-pillars-zero-answers-towards-new-scorecard-observability/).    
 
