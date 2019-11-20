@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: latency-deployment
+  labels:
+    app: latency
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: latency
+  template:
+    metadata:
+      labels:
+        app: latency
+    spec:
+      containers:
+      - name: latency-server
+        image: gcr.io/stack-doctor/latency-lbm-demo:latest
+        ports:
+        - containerPort: 8080
