@@ -32,7 +32,7 @@ The term "log-based metrics" is rather specific to Stackdriver, but the idea is 
 
 ## Counter metric - errors
 
-Let's take a look at a simple example.  I've created a simple [example](https://github.com/yuriatgoogle/logbasedmetrics/blob/master/errors.js) that writes an error 20% of the time.  When I run the code locally after authenticating through the Google Cloud SDK, here are the log entries:
+Let's take a look at a simple example.  I've created a simple [example](https://github.com/yuriatgoogle/stack-doctor/blob/master/log-based-metrics/errors/errors.js) that writes an error 20% of the time.  When I run the code locally after authenticating through the Google Cloud SDK, here are the log entries:
 
 ![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/log-based-metrics/images/2-%20matching%20error%20entries.png?raw=true)
 
@@ -54,7 +54,7 @@ Once I click Create Metric, I can then go to Stackdriver Monitoring and see it t
 
 ## Distribution metric - latency
 
-Now that you've seen how to create a simple counter metric that will track the number of errors per minute, let's take a look at the other reason we might want to use log-based metrics - to track a specific numeric value in the log payload.  I've created a second [example](https://github.com/yuriatgoogle/logbasedmetrics/blob/master/latency.js) - this time, I'm introducing a randomly generated delay in the code and logging it as the latency.  Here's what the payload looks like:
+Now that you've seen how to create a simple counter metric that will track the number of errors per minute, let's take a look at the other reason we might want to use log-based metrics - to track a specific numeric value in the log payload.  I've created a second [example](https://github.com/yuriatgoogle/stack-doctor/blob/master/log-based-metrics/latency/latency.js) - this time, I'm introducing a randomly generated delay in the code and logging it as the latency.  Here's what the payload looks like:
 
 ![image](https://github.com/yuriatgoogle/stack-doctor/blob/master/log-based-metrics/images/7%20-%20latency%20payload.png?raw=true)
 
