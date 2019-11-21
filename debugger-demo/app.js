@@ -24,7 +24,7 @@ app.get('/', (req, res) => {
     randomInt = getRandomInt(10);
     if (randomInt > 5) {
         console.log("an error was encountered")
-        res.status(500).send("there was an error!")
+        return res.status(500).send("there was an error!")
     }
     res.send('request made');
 })
