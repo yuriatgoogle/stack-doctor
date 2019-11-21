@@ -11,7 +11,8 @@ require('@google-cloud/debug-agent').start({
     serviceContext: {
       service: serviceName,
       version: serviceVersion
-    }
+    },
+    allowExpressions: true
   });
 
 function getRandomInt(max) {
