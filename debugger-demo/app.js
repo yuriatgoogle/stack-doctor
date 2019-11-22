@@ -2,8 +2,8 @@ const express = require('express');
 const app = express();
 
 const projectID = 'stack-doctor';
-const serviceName = "debugger-demo";
-const serviceVersion = "1.1"
+const serviceName = "debugger-demo-cloudrun";
+const serviceVersion = "1.0"
 
 require('@google-cloud/debug-agent').start({
     projectId: projectID,
