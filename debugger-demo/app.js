@@ -3,11 +3,11 @@ const app = express();
 
 const projectID = 'stack-doctor';
 const serviceName = "debugger-demo-cloudrun";
-const serviceVersion = "1.0"
+const serviceVersion = "1.1"
 
 require('@google-cloud/debug-agent').start({
-    projectId: projectID,
-    keyFilename: './key.json',
+    //projectId: projectID,
+    //keyFilename: './key.json',
     serviceContext: {
       service: serviceName,
       version: serviceVersion
