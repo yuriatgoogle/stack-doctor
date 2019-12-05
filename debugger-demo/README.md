@@ -2,7 +2,7 @@
 
 [Incident management](https://landing.google.com/sre/sre-book/chapters/managing-incidents/) is one of the core practices of Site Reliability Engineering.  As part of that, the SRE Book recommends focusing on prioritization during the incident itself.  Specifically:
 
-> **Prioritize**. Stop the bleeding, restore service, and preserve the evidence for root-causing._
+> **Prioritize**. Stop the bleeding, restore service, and preserve the evidence for root-causing.
 
 However, there may still be times when you may need to try to debug in production - for example, you may be struggling to reproduce a problem locally or in a dev environment, and production may be the only place where it happens reliably enough.  In this situation, redeploying with additional logging enabled may not be an option, especially if there's an incident in progress.  There may be other times when an error isn't enough of a problem to impact your SLO, but you still want to fix it.  
 
