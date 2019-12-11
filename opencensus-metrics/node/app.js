@@ -72,6 +72,14 @@ globalStats.registerExporter(exporter);
 
 app.get('/', (req, res) => {
     console.log("request made");
+
+    // record metric values
+    globalStats.record([
+        {
+          measure: REQUEST_COUNT,
+          value: 1,
+        },
+      ]);
     res.status(200).send("success!");
 })
 
