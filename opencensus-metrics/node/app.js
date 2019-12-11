@@ -16,12 +16,12 @@ const REQUEST_COUNT = globalStats.createMeasureInt64(
     'Number of requests to the server'
 );
 // request count view
-const request_count_view = globalStats.createView(
-    'request_count_view',
+const request_count_metric = globalStats.createView(
+    'request_count_metric',
     REQUEST_COUNT,
-    AggregationType.LAST_VALUE
+    AggregationType.COUNT
 );
-globalStats.registerView(request_count_view);
+globalStats.registerView(request_count_metric);
 
 // error count measure
 const ERROR_COUNT = globalStats.createMeasureInt64(
@@ -30,12 +30,12 @@ const ERROR_COUNT = globalStats.createMeasureInt64(
     'Number of failed requests to the server'
 );
 // error count view
-const error_count_view = globalStats.createView(
-    'error_count_view',
+const error_count_metric = globalStats.createView(
+    'error_count_metric',
     ERROR_COUNT,
-    AggregationType.LAST_VALUE
+    AggregationType.COUNT
 );
-globalStats.registerView(error_count_view);
+globalStats.registerView(error_count_metric);
 
 // response latency measure
 const RESPONSE_LATENCY = globalStats.createMeasureInt64(
@@ -44,8 +44,8 @@ const RESPONSE_LATENCY = globalStats.createMeasureInt64(
     'The server response latency in milliseconds'
   );
 // response latency view
-const latency_view = globalStats.createView(
-    'response_latency_view',
+const latency_metric = globalStats.createView(
+    'response_latency_metric',
     RESPONSE_LATENCY,
     AggregationType.DISTRIBUTION,
     [],
@@ -53,7 +53,7 @@ const latency_view = globalStats.createView(
     // Latency in buckets:
     [0, 100, 500, 1000]
   );
-globalStats.registerView(latency_view);
+globalStats.registerView(latency_metric);
 
 // set up the Stackdriver exporter
 const projectId = 'stack-doctor';
@@ -61,7 +61,7 @@ const projectId = 'stack-doctor';
 // GOOGLE_APPLICATION_CREDENTIALS are expected by a dependency of this code
 // Not this code itself. Checking for existence here but not retaining (as not needed)
 if (!projectId || !process.env.GOOGLE_APPLICATION_CREDENTIALS) {
-  throw Error('Unable to proceed without a Project ID');
+  // throw Error('Unable to proceed without a Project ID');
 }
 const exporter = new StackdriverStatsExporter({
   projectId: projectId,
@@ -73,13 +73,22 @@ globalStats.registerExporter(exporter);
 app.get('/', (req, res) => {
     console.log("request made");
 
-    // record metric values
+    // record a request count
     globalStats.record([
         {
           measure: REQUEST_COUNT,
           value: 1,
         },
       ]);
+    // record latency
+    globalStats.record([
+      {
+        measure: RESPONSE_LATENCY,
+        value: 100,
+      }
+    ]);
+    
+    // send response
     res.status(200).send("success!");
 })
 
