@@ -1,5 +1,13 @@
 const express = require('express');
 const app = express();
+var Stopwatch = require("node-stopwatch").Stopwatch;
+
+function msleep(n) {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, n);
+}
+function sleep(n) {
+  msleep(n*1000);
+}
 
 // opencensus setup
 const {globalStats, MeasureUnit, AggregationType} = require('@opencensus/core');
@@ -71,25 +79,62 @@ globalStats.registerExporter(exporter);
 
 
 app.get('/', (req, res) => {
+    
+    // start request timer
+    var stopwatch = Stopwatch.create();
+    stopwatch.start();
     console.log("request made");
 
-    // record a request count
+    // record a request count for every request
     globalStats.record([
         {
           measure: REQUEST_COUNT,
           value: 1,
         },
       ]);
-    // record latency
+    
+    // randomly throw an error 10% of the time
+    var randomValue = Math.floor(Math.random() * (9) + 1);
+    if (randomValue == 1){
+      
+      // record a failed request
+      globalStats.record([
+        {
+          measure: ERROR_COUNT,
+          value: 1,
+        },
+      ]);
+
+      // return error
+      res.status(500).send("failure");
+
+      // record latency
+      globalStats.record([
+        {
+          measure: RESPONSE_LATENCY,
+          value: stopwatch.elapsedMilliseconds,
+        }
+      ]);
+      stopwatch.stop();
+    }
+    // end random error
+
+    // sleep for a random number of seconds
+    randomValue = Math.floor(Math.random() * (9) + 1);
+    sleep(randomValue);
+
+    // send successful response
+    res.status(200).send("success after waiting for " + randomValue + " seconds");
+
+    // record latency for every request
     globalStats.record([
       {
         measure: RESPONSE_LATENCY,
-        value: 100,
+        value: stopwatch.elapsedMilliseconds,
       }
     ]);
-    
-    // send response
-    res.status(200).send("success!");
+
+    stopwatch.stop();
 })
 
 

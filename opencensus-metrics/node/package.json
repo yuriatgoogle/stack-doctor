@@ -11,6 +11,7 @@
   "dependencies": {
     "@opencensus/core": "0.0.19",
     "@opencensus/exporter-stackdriver": "0.0.19",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "node-stopwatch": "0.0.1"
   }
 }
