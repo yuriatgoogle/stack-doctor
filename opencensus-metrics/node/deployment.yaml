@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opencensus-deployment
+  labels:
+    app: opencensus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opencensus
+  template:
+    metadata:
+      labels:
+        app: opencensus
+    spec:
+      containers:
+      - name: opencensus-server
+        image: gcr.io/stack-doctor/opencensus-metrics:latest
+        ports:
+        - containerPort: 8080
