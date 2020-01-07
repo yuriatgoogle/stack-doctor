@@ -230,12 +230,13 @@ As expected, the output shows me the fractional ratio of good requests to total 
 
 The second question I wanted to answer is "how much error budget do I have left?"  The operator for that is the select_slo_budget_fraction.  The only change in the request is to change the filter:
 
-> name:projects/stack-doctor  
+```name:projects/stack-doctor  
 filter:select_slo_budget_fraction("projects/860128900282/services/gae:stack-doctor_default/serviceLevelObjectives/2IooYmjTSROak0g9f-DmpA")  
 interval.endTime:2020-01-06T17:17:00.0Z  
 interval.startTime:2020-01-05T17:17:00.0Z  
 aggregation.alignmentPeriod:3600s  
 aggregation.perSeriesAligner:ALIGN_MEAN
+```
 
 After making a request to the timeSeries.list method, I got the following return:
 
