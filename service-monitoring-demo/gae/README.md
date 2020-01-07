@@ -37,7 +37,7 @@ Next, I deployed the app using `gcloud app deploy`.  At this point, the build pr
 
 Finally, I set up a global Uptime Check to get a steady stream of traffic flowing to my new app:
 
-![image](https://drive.google.com/a/google.com/file/d/1l8Etm-03HYKhArFtbOsENBXFwdX7RPN-/view?usp=drivesdk)
+![image](https://github.com/yuriatgoogle/stack-doctor/raw/master/service-monitoring-demo/gae/images/1-uptimecheck.png)
 
 # Defining the SLI
 
