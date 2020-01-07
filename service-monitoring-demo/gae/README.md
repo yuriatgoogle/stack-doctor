@@ -49,13 +49,13 @@ Now that I had a service created, I was ready to proceed.  I found the [document
 
 Thankfully, App Engine exposes a useful response count metric:
 
-![image](https://drive.google.com/a/google.com/file/d/1pu_dB_CqzJsdFA-wsQfKeGu-rIASeu9F/view?usp=drivesdk)
+![image](https://github.com/yuriatgoogle/stack-doctor/raw/master/service-monitoring-demo/gae/images/2-metric.png)
 
 > **Note** that this metric is not written if the GAE application is disabled (as I learned by attempting to simulate a failure by disabling the app).  
 
 This metric can further be filtered by response code:
 
-![image](https://drive.google.com/a/google.com/file/d/1D14Uwvjn6lfzeW9HGtTanxaMHnHT8Kpd/view?usp=drivesdk)
+![image](https://github.com/yuriatgoogle/stack-doctor/raw/master/service-monitoring-demo/gae/images/3-filtered.png)
 
 I decided to use the unfiltered metric to count total requests and filter requests with a response code of 200 to count "good" requests for the sake of simplicity.  
 
@@ -67,7 +67,7 @@ I then chose a 1 day rolling window as my SLO time frame.  For a lot more inform
 
 At this point, I was ready to use the [API](https://cloud.google.com/monitoring/service-monitoring/identifying-custom-sli) to define my SLO.  As recommended in the "[Building the SLI](https://cloud.google.com/monitoring/service-monitoring/identifying-custom-sli#configure-sli)" section, I used the Metrics Explorer to create a chart that showed my "total" request count:
 
-![image](https://drive.google.com/a/google.com/file/d/1sWlHNH2eePzV-6exQI_3zWyuOFHYO-BN/view?usp=drivesdk)
+![image](https://github.com/yuriatgoogle/stack-doctor/raw/master/service-monitoring-demo/gae/images/4-json.png)
 
 From there, I was able to copy the JSON for the filter:
 
@@ -136,7 +136,7 @@ Finally, I submitted the request to the API using [Postman](https://www.getpostm
 
 Now that my SLO was defined, I wanted to achieve two things - create an alert for SLO violation and figure out how to get a status without tripping an alert.  I was able to use the UI to create an alerting policy using the "SLO BURN RATE" condition type:
 
-![image](https://drive.google.com/a/google.com/file/d/1Jpmn6628PEBZ7cUptsemoD5jtvYif8Hq/view?usp=drivesdk)
+![image](https://github.com/yuriatgoogle/stack-doctor/raw/master/service-monitoring-demo/gae/images/5-policy.png)
 
 When setting up the alerting policy, I ran into two fields whose meaning was not immediately clear to me.  The first one is Lookback Duration.  I was able to find an explanation in the [documentation](https://cloud.google.com/monitoring/alerts/concepts-indepth#condition-types) - because burn rate is fundamentally a rate of change condition, you have the option of specifying a custom lookback window.  For other rate of change conditions, the lookback is set to 10 minutes and cannot be changed.  From the doc for rate of change conditions:
 
@@ -171,7 +171,7 @@ func main() {
 
 and redeployed the app.  Fairly quickly, I got an incident:
 
-![image](https://drive.google.com/a/google.com/file/d/1z1GcwH7_2p5guRPXu7duobjATE27izv2/view?usp=drivesdk)
+![image](https://github.com/yuriatgoogle/stack-doctor/raw/master/service-monitoring-demo/gae/images/6-incident.png)
 
 I was satisfied with this and redeployed the app with the original code to get it working again.  In short order, the incident was resolved.
 
