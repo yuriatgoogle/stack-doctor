@@ -1,11 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
-	"context"
+
 	// "io/ioutil"
 	// "google.golang.org/grpc/codes"
 	"time"
@@ -14,9 +15,11 @@ import (
 
 	"go.opentelemetry.io/otel/api/distributedcontext"
 	"go.opentelemetry.io/otel/api/global"
+
 	// "go.opentelemetry.io/otel/api/key"
 	apitrace "go.opentelemetry.io/otel/api/trace"
 	"go.opentelemetry.io/otel/exporter/trace/stackdriver"
+
 	//"go.opentelemetry.io/otel/plugin/httptrace"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
@@ -28,19 +31,19 @@ var (
 )
 
 func mainHandler(w http.ResponseWriter, r *http.Request) {
-	
+
 	tr := global.TraceProvider().Tracer("OT-tracing-demo")
 
 	client := http.DefaultClient
 	ctx := distributedcontext.NewContext(context.Background())
-	
+
 	// var body []byte
 
-	// create root span
+	// create root span - works
 	ctx, rootSpan := tr.Start(ctx, "incoming call")
 	defer rootSpan.End()
 
-	// create child span...?
+	// how to create child span...?
 	ctx, childSpan := tr.Start(ctx, "backend call", apitrace.SpanFromContext(ctx))
 
 	// create request for backend call
@@ -60,9 +63,8 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("%v", err)
 	}
 
-
 	// send backend request
-	
+
 	/* err := tr.WithSpan(ctx, "incoming call",  // root span here
 		func(ctx context.Context) error {
 			req, _ := http.NewRequest("GET", backendAddr, nil)
@@ -120,8 +122,7 @@ func main() {
 
 	// TODO - add handler with propagation from OT
 	//log.Fatal(http.ListenAndServe(":8081", handler))
-	
-	http.ListenAndServe(":8080", r)
 
+	http.ListenAndServe(":8080", r)
 
 }
