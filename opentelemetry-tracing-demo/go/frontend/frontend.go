@@ -6,17 +6,18 @@ import (
 	"net/http"
 	"os"
 	"context"
-	"io/ioutil"
-	"google.golang.org/grpc/codes"
+	// "io/ioutil"
+	// "google.golang.org/grpc/codes"
+	"time"
 
 	"github.com/gorilla/mux"
 
 	"go.opentelemetry.io/otel/api/distributedcontext"
 	"go.opentelemetry.io/otel/api/global"
 	// "go.opentelemetry.io/otel/api/key"
-	"go.opentelemetry.io/otel/api/trace"
+	apitrace "go.opentelemetry.io/otel/api/trace"
 	"go.opentelemetry.io/otel/exporter/trace/stackdriver"
-	"go.opentelemetry.io/otel/plugin/httptrace"
+	//"go.opentelemetry.io/otel/plugin/httptrace"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
@@ -33,11 +34,36 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 	client := http.DefaultClient
 	ctx := distributedcontext.NewContext(context.Background())
 	
-	var body []byte
+	// var body []byte
+
+	// create root span
+	ctx, rootSpan := tr.Start(ctx, "incoming call")
+	defer rootSpan.End()
+
+	// create child span...?
+	ctx, childSpan := tr.Start(ctx, "backend call", apitrace.SpanFromContext(ctx))
+
+	// create request for backend call
+	req, err := http.NewRequest("GET", backendAddr, nil)
+	if err != nil {
+		log.Fatalf("%v", err)
+	}
+	childCtx, cancel := context.WithTimeout(ctx, 1000*time.Millisecond)
+	defer cancel()
+	req = req.WithContext(childCtx)
+
+	// add span context to backend call and make request
+	// format := &tracecontext.HTTPFormat{}
+	// format.SpanContextToRequest(rootSpan.SpanContext(), req)
+	res, err := client.Do(req)
+	if err != nil {
+		log.Fatalf("%v", err)
+	}
+
 
 	// send backend request
 	
-	err := tr.WithSpan(ctx, "incoming call",  // root span here
+	/* err := tr.WithSpan(ctx, "incoming call",  // root span here
 		func(ctx context.Context) error {
 			req, _ := http.NewRequest("GET", backendAddr, nil)
 
@@ -59,7 +85,9 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("%v\n", 200) //change to status code from backend
+
+	*/
+	fmt.Printf("%v\n", res.Status) //change to status code from backend
 }
 
 func initTracer() {
