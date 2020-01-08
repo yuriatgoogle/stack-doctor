@@ -72,10 +72,13 @@ func mainHandler(w http.ResponseWriter, req *http.Request) {
 
 func main() {
 	initTracer()
-	
-    // handle root request
+
 	r := mux.NewRouter()
 	r.HandleFunc("/", mainHandler)
 	
-	http.ListenAndServe(":8081", r)
+	if (env=="LOCAL") {
+		http.ListenAndServe("localhost:8081", r)
+	} else {
+		http.ListenAndServe(":8081", r)
+	}
 }

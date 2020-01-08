@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	// "fmt"
 	"log"
 	"net/http"
 	"os"
@@ -25,6 +25,7 @@ var (
 	projectID   = os.Getenv("PROJECT_ID")
 	backendAddr = os.Getenv("BACKEND")
 	location    = os.Getenv("LOCATION")
+	env			= os.Getenv("ENV")
 )
 
 func mainHandler(w http.ResponseWriter, r *http.Request) {
@@ -55,7 +56,7 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 			body, err = ioutil.ReadAll(res.Body)
 			_ = res.Body.Close()
 			trace.SpanFromContext(ctx).SetStatus(codes.OK)
-			fmt.Printf(res.Status)
+			log.Printf("got response: %d\n", res.Status)
 			return err
 		})
 
@@ -63,7 +64,7 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	fmt.Printf("%v\n", "OK") //change to status code from backend
+	// fmt.Printf("%v\n", "OK") //change to status code from backend
 }
 
 func initTracer() {
@@ -90,14 +91,12 @@ func initTracer() {
 func main() {
 	initTracer()
 
-	// handle root request
 	r := mux.NewRouter()
 	r.HandleFunc("/", mainHandler)
-
-	// TODO - add handler with propagation from OT
-	//log.Fatal(http.ListenAndServe(":8081", handler))
 	
-	http.ListenAndServe(":8080", r)
-
-
+	if (env=="LOCAL") {
+		http.ListenAndServe("localhost:8080", r)
+	} else {
+		http.ListenAndServe(":8080", r)
+	}
 }
