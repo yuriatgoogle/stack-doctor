@@ -11,7 +11,7 @@ import (
 	// "google.golang.org/grpc/codes"
 	//"time"
 
-	// "github.com/gorilla/mux"
+	"github.com/gorilla/mux"
 
 	"go.opentelemetry.io/otel/api/distributedcontext"
 	"go.opentelemetry.io/otel/api/global"
@@ -48,33 +48,34 @@ func initTracer() {
 	global.SetTraceProvider(tp)
 }
 
+func mainHandler(w http.ResponseWriter, req *http.Request) {
+    tr := global.TraceProvider().Tracer("backend")
+    attrs, entries, spanCtx := httptrace.Extract(req.Context(), req)
+
+    req = req.WithContext(distributedcontext.WithMap(req.Context(), distributedcontext.NewMap(distributedcontext.MapUpdate{
+        MultiKV: entries,
+    })))
+
+    ctx, span := tr.Start(
+        req.Context(),
+        "hello",
+        trace.WithAttributes(attrs...),
+        trace.ChildOf(spanCtx),
+    )
+    defer span.End()
+
+    span.AddEvent(ctx, "handling this...")
+
+    _, _ = io.WriteString(w, "Hello, world!\n")
+
+}
+
 func main() {
 	initTracer()
-	tr := global.TraceProvider().Tracer("backend")
-
-	helloHandler := func(w http.ResponseWriter, req *http.Request) {
-		attrs, entries, spanCtx := httptrace.Extract(req.Context(), req)
-
-		req = req.WithContext(distributedcontext.WithMap(req.Context(), distributedcontext.NewMap(distributedcontext.MapUpdate{
-			MultiKV: entries,
-		})))
-
-		ctx, span := tr.Start(
-			req.Context(),
-			"hello",
-			trace.WithAttributes(attrs...),
-			trace.ChildOf(spanCtx),
-		)
-		defer span.End()
-
-		span.AddEvent(ctx, "handling this...")
-
-		_, _ = io.WriteString(w, "Hello, world!\n")
-	}
-
-	http.HandleFunc("/", helloHandler)
-	err := http.ListenAndServe(":8081", nil)
-	if err != nil {
-		panic(err)
-	}
+	
+    // handle root request
+	r := mux.NewRouter()
+	r.HandleFunc("/", mainHandler)
+	
+	http.ListenAndServe(":8081", r)
 }
