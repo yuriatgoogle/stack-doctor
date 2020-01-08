@@ -38,7 +38,6 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 	var body []byte
 
 	err := tr.WithSpan(ctx, "incoming call",  // root span here
-		//func(ctx context.Context) error {
 		func(ctx context.Context) error {
 			// create backend request
 			req, _ := http.NewRequest("GET", backendAddr, nil)
