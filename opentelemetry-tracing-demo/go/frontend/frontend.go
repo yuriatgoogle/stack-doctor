@@ -1,26 +1,23 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
-
-	// "io/ioutil"
-	// "google.golang.org/grpc/codes"
-	"time"
+	"context"
+	"io/ioutil"
+	"google.golang.org/grpc/codes"
+	//"time"
 
 	"github.com/gorilla/mux"
 
 	"go.opentelemetry.io/otel/api/distributedcontext"
 	"go.opentelemetry.io/otel/api/global"
-
 	// "go.opentelemetry.io/otel/api/key"
-	apitrace "go.opentelemetry.io/otel/api/trace"
+	"go.opentelemetry.io/otel/api/trace"
 	"go.opentelemetry.io/otel/exporter/trace/stackdriver"
-
-	//"go.opentelemetry.io/otel/plugin/httptrace"
+	"go.opentelemetry.io/otel/plugin/httptrace"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
@@ -31,48 +28,26 @@ var (
 )
 
 func mainHandler(w http.ResponseWriter, r *http.Request) {
-
+	
 	tr := global.TraceProvider().Tracer("OT-tracing-demo")
 
 	client := http.DefaultClient
 	ctx := distributedcontext.NewContext(context.Background())
+	
+	var body []byte
 
-	// var body []byte
-
-	// create root span - works
-	ctx, rootSpan := tr.Start(ctx, "incoming call")
-	defer rootSpan.End()
-
-	// how to create child span...?
-	ctx, childSpan := tr.Start(ctx, "backend call", apitrace.SpanFromContext(ctx))
-
-	// create request for backend call
-	req, err := http.NewRequest("GET", backendAddr, nil)
-	if err != nil {
-		log.Fatalf("%v", err)
-	}
-	childCtx, cancel := context.WithTimeout(ctx, 1000*time.Millisecond)
-	defer cancel()
-	req = req.WithContext(childCtx)
-
-	// add span context to backend call and make request
-	// format := &tracecontext.HTTPFormat{}
-	// format.SpanContextToRequest(rootSpan.SpanContext(), req)
-	res, err := client.Do(req)
-	if err != nil {
-		log.Fatalf("%v", err)
-	}
-
-	// send backend request
-
-	/* err := tr.WithSpan(ctx, "incoming call",  // root span here
+	err := tr.WithSpan(ctx, "incoming call",  // root span here
+		//func(ctx context.Context) error {
 		func(ctx context.Context) error {
+			// create backend request
 			req, _ := http.NewRequest("GET", backendAddr, nil)
 
+			// inject context
 			ctx, req = httptrace.W3C(ctx, req)
 			httptrace.Inject(ctx, req)
 
-			fmt.Printf("Sending request...\n")
+			// do request
+			log.Printf("Sending request...\n")
 			res, err := client.Do(req)
 			if err != nil {
 				panic(err)
@@ -80,7 +55,7 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 			body, err = ioutil.ReadAll(res.Body)
 			_ = res.Body.Close()
 			trace.SpanFromContext(ctx).SetStatus(codes.OK)
-
+			fmt.Printf(res.Status)
 			return err
 		})
 
@@ -88,8 +63,7 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	*/
-	fmt.Printf("%v\n", res.Status) //change to status code from backend
+	fmt.Printf("%v\n", "OK") //change to status code from backend
 }
 
 func initTracer() {
@@ -122,7 +96,8 @@ func main() {
 
 	// TODO - add handler with propagation from OT
 	//log.Fatal(http.ListenAndServe(":8081", handler))
-
+	
 	http.ListenAndServe(":8080", r)
+
 
 }
