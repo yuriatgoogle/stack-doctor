@@ -16,7 +16,7 @@ From the reference guide:
 
 This is well illustrated in the aforementioned research paper using this diagram:
 
-![image]([./images/](https://github.com/yuriatgoogle/stack-doctor/raw/master/opentelemetry-tracing-demo/images/)2-diagram.png)
+![image](https://github.com/yuriatgoogle/stack-doctor/raw/master/opentelemetry-tracing-demo/images/2-diagram.png)
 
 # Implementation
 Let's take a look at how we can implement distributed tracing in our frontend/backend service pair using OpenTelemetry. Note that most of this is adopted from the [samples](https://github.com/open-telemetry/opentelemetry-go/tree/master/example) published by OpenTelemetry in their Github [repo](https://github.com/open-telemetry/opentelemetry-go). I made relatively minor changes to add custom spans and use the Mux router, rather than just basic HTTP handling. 
