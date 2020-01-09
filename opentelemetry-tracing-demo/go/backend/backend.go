@@ -1,13 +1,13 @@
 package main
 
 import (
-	// "fmt"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 	// "context"
 	// "io/ioutil"
-    "io"
+    // "io"
 	// "google.golang.org/grpc/codes"
 	//"time"
 
@@ -26,6 +26,7 @@ var (
 	projectID   = os.Getenv("PROJECT_ID")
 	backendAddr = os.Getenv("BACKEND")
 	location    = os.Getenv("LOCATION")
+    env			= os.Getenv("ENV")
 )
 
 func initTracer() {
@@ -49,25 +50,31 @@ func initTracer() {
 }
 
 func mainHandler(w http.ResponseWriter, req *http.Request) {
+    // start tracer
     tr := global.TraceProvider().Tracer("backend")
+    // get context from incoming request
     attrs, entries, spanCtx := httptrace.Extract(req.Context(), req)
 
+    // create request using context
     req = req.WithContext(distributedcontext.WithMap(req.Context(), distributedcontext.NewMap(distributedcontext.MapUpdate{
         MultiKV: entries,
     })))
 
+    // create span
     ctx, span := tr.Start(
         req.Context(),
-        "hello",
+        "backend call received",
         trace.WithAttributes(attrs...),
         trace.ChildOf(spanCtx),
     )
-    defer span.End()
 
-    span.AddEvent(ctx, "handling this...")
+    span.AddEvent(ctx, "handling backend call")
 
-    _, _ = io.WriteString(w, "Hello, world!\n")
-
+    // output
+    log.Printf("backend call received")
+    fmt.Printf("OK")
+    // close span
+    span.End()
 }
 
 func main() {

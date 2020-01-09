@@ -1,7 +1,7 @@
 package main
 
 import (
-	// "fmt"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -42,6 +42,7 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 			
 			// create child span
 			ctx, childSpan := tr.Start(ctx, "backend call")
+			childSpan.AddEvent (ctx, "making backend call")
 
 			// create backend request
 			req, _ := http.NewRequest("GET", backendAddr, nil)
@@ -64,14 +65,13 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 
 			trace.SpanFromContext(ctx).SetStatus(codes.OK)
 			log.Printf("got response: %d\n", res.Status)
+			fmt.Printf("%v\n", "OK") //change to status code from backend
 			return err
 		})
 
 	if err != nil {
 		panic(err)
-	}
-
-	// fmt.Printf("%v\n", "OK") //change to status code from backend
+	}	
 }
 
 func initTracer() {
