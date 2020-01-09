@@ -3,7 +3,7 @@ Toward the end of last year, I had the good fortune of publishing a reference [g
 # Objective
 For this exercise, I built a simple [demo](https://github.com/yuriatgoogle/stack-doctor/opentelemetry-tracing-demo).  It consists of two services. The frontend service receives an incoming request and makes a request to the backend.  The backend receives the request and returns a response.  Our objective is to trace this interaction to determine the overall response latency and understand how the two services and the nework connectivity between them contribute to the overall latency.
 
-![image](./images/1-architecture.png)
+![image](https://github.com/yuriatgoogle/stack-doctor/raw/master/opentelemetry-tracing-demo/images/1-architecture.png)
 
 In the original guide, the two services were deployed in two separate GKE clusters, but that is actually not necessary to demonstrate distributed tracing.  For this exercise, we'll simply run both services locally.
 
@@ -16,7 +16,7 @@ From the reference guide:
 
 This is well illustrated in the aforementioned research paper using this diagram:
 
-![image](./images/2-diagram.png)
+![image]([./images/](https://github.com/yuriatgoogle/stack-doctor/raw/master/opentelemetry-tracing-demo/images/)2-diagram.png)
 
 # Implementation
 Let's take a look at how we can implement distributed tracing in our frontend/backend service pair using OpenTelemetry. Note that most of this is adopted from the [samples](https://github.com/open-telemetry/opentelemetry-go/tree/master/example) published by OpenTelemetry in their Github [repo](https://github.com/open-telemetry/opentelemetry-go). I made relatively minor changes to add custom spans and use the Mux router, rather than just basic HTTP handling. 
@@ -199,7 +199,7 @@ The `mainHandler()` function does look quite different.  Here, we extract the sp
 # Traces
 Now that we've seen how to implement tracing instrumentation in our code, let's take a look at what this instrumentation creates.  We can run both frontend and backend locally after setting the relevant environment variables for each and using `gcloud auth login` to log in to Google Cloud.  Once we do that, we can hit the frontend on http://localhost:8080 and issue a few requests.  This should immediately result in traces being written to Stackdriver:
 
-![image](./images/3-traces.png)
+![image](https://github.com/yuriatgoogle/stack-doctor/raw/master/opentelemetry-tracing-demo/images/3-traces.png)
 
 You can see the span names we specified in our code and the events we added for clearer labeling.  One additional thing I was pleasantly surprised by is that OpenTelemetry explicitly adds steps for the HTTP/networking stack, including DNS, connecting, and sending and receiving data.  
 
