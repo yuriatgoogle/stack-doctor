@@ -39,6 +39,10 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := tr.WithSpan(ctx, "incoming call",  // root span here
 		func(ctx context.Context) error {
+			
+			// create child span
+			ctx, childSpan := tr.Start(ctx, "backend call")
+
 			// create backend request
 			req, _ := http.NewRequest("GET", backendAddr, nil)
 
@@ -54,6 +58,10 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			body, err = ioutil.ReadAll(res.Body)
 			_ = res.Body.Close()
+
+			// close child span
+			childSpan.End()
+
 			trace.SpanFromContext(ctx).SetStatus(codes.OK)
 			log.Printf("got response: %d\n", res.Status)
 			return err
