@@ -55,3 +55,38 @@ const responseLatency = meter.createGauge("response_latency", {
 const labels = meter.labels({ metricOrigin: process.env.ENV});
 ```
 In the next part, I define the three metrics I want to track.  Request count and error count are both monotonic counters, in that they can only be increased.  Response latency is a non-monotonic gauge, since I want to track latency for every request.  
+
+### Request handling
+```go
+app.get('/', (req, res) => {
+    // start latency timer
+    const requestReceived = new Date().getTime();
+    console.log('request made');
+    // increment total requests counter
+    requestCount.bind(labels).add(1);
+    // return an error 1% of the time
+    if ((Math.floor(Math.random() * 100)) > 50) {
+        // increment error counter
+        errorCount.bind(labels).add(1);
+        // return error code
+        res.status(500).send("error!")
+    } 
+    else {
+        // delay for a bit
+        sleep(Math.floor(Math.random()*10000));
+        // record response latency
+        const measuredLatency = new Date().getTime() - requestReceived;
+        responseLatency.bind(labels).set(measuredLatency)
+        res.status(200).send("success in " + measuredLatency + " ms")
+    }
+})
+
+app.listen(8080, () => console.log(`Example app listening on port 8080!`))
+```
+Finally, I'm ready to accept incoming requests.  Requests to `:8081/metrics` will be handled by Prometheus, and I'm using Express to handle requests to `:8080/`. For every request, I create a timer and keep it running until I'm ready to respond.  I generate a random number between 0 and 100 and use it to return an error half the time, in which case latency is not reported.  If there's no error to return, I delay for another random value (between 0 and 10 seconds) and return that value as the latency.
+
+### Metrics endpoint
+When I run the app locally, I can then hit the `/metrics` endpoint:
+
+![image](./images/metricsendpoint.png)
+
