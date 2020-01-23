@@ -86,7 +86,8 @@ app.listen(8080, () => console.log(`Example app listening on port 8080!`))
 Finally, I'm ready to accept incoming requests.  Requests to `:8081/metrics` will be handled by Prometheus, and I'm using Express to handle requests to `:8080/`. For every request, I create a timer and keep it running until I'm ready to respond.  I generate a random number between 0 and 100 and use it to return an error half the time, in which case latency is not reported.  If there's no error to return, I delay for another random value (between 0 and 10 seconds) and return that value as the latency.
 
 ### Metrics endpoint
-When I run the app locally, I can then hit the `/metrics` endpoint:
+When I run the app locally, I can then hit the `/metrics` endpoint and see the metrics I've registered there.
 
-![image](./images/metricsendpoint.png)
+![image](https://github.com/yuriatgoogle/stack-doctor/raw/master/opentelemetry-metrics-demo/images/metricsendpoint.png))
 
+# Deploying the app
