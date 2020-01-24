@@ -8,31 +8,26 @@ As always, I've made my code available in a Github [repo](https://github.com/yur
 
 ### Imports and setup
 ```go
-// imports
-const express = require ('express')
-const { MeterRegistry } = require('@opentelemetry/metrics');
-const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
-
-function sleep (n) {
-    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, n);
-}
-
 // set up prometheus 
-const app = express()
+const prometheusPort = 8081;
+const app = express();
 const meter = new MeterRegistry().getMeter('example-prometheus');
 const exporter = new PrometheusExporter(
   {
     startServer: true,
-    port: 8081
+    port: prometheusPort
   },
   () => {
-    console.log("prometheus scrape endpoint: http://localhost:8080/metrics");
+    console.log("prometheus scrape endpoint: http://localhost:"
+      + prometheusPort 
+      + "/metrics");
   }
 );
 meter.addExporter(exporter);
 ```
 
-I'm only using three external packages - Express to handle requests and two OpenTelemetry packages - one to write the metrics, and another to export them to Prometheus.  Requests to `:8081/metrics` will be handled by Prometheus.
+I'm only using three external packages - Express to handle requests and two OpenTelemetry packages - one to write the metrics, and another to export them to Prometheus.  Requests to `:8081/metrics` will be handled by Prometheus.  
+> Note that I've overridden the default port that's set in the Prometheus exporter [code](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-exporter-prometheus/src/prometheus.ts#L32-L38).
 
 ### Metric definition
 ```go
@@ -54,7 +49,7 @@ const responseLatency = meter.createGauge("response_latency", {
 });
 const labels = meter.labels({ metricOrigin: process.env.ENV});
 ```
-In the next part, I define the three metrics I want to track.  Request count and error count are both monotonic counters, in that they can only be increased.  Response latency is a non-monotonic gauge, since I want to track latency for every request.  
+In the next part, I define the three metrics I want to track.  Request count and error count are both monotonic counters, in that they can only be increased.  Response latency is a non-monotonic gauge, since I want to track latency for every request.  I am also using a single label - I could not figure how to get metrics to work properly with no labels (in the next section).
 
 ### Request handling
 ```go
@@ -83,7 +78,7 @@ app.get('/', (req, res) => {
 
 app.listen(8080, () => console.log(`Example app listening on port 8080!`))
 ```
-Finally, I'm ready to accept incoming requests.  Requests to `:8081/metrics` will be handled by Prometheus, and I'm using Express to handle requests to `:8080/`. For every request, I create a timer and keep it running until I'm ready to respond.  I generate a random number between 0 and 100 and use it to return an error half the time, in which case latency is not reported.  If there's no error to return, I delay for another random value (between 0 and 10 seconds) and return that value as the latency.
+Finally, I'm ready to accept incoming requests.  Requests to `:8081/metrics` will be handled by Prometheus, and I'm using Express to handle requests to `:8080/`. For every request, I create a timer (`measuredLatency`) and keep it running until I'm ready to respond.  I generate a random number between 0 and 100 and use it to return an error half the time, in which case latency is not reported.  If there's no error to return, I `sleep` for another random value (between 0 and 10 seconds), take another time snapshot, calculate the elapsed time, and return that value as the latency.
 
 ### Metrics endpoint
 When I run the app locally, I can then hit the `/metrics` endpoint and see the metrics I've registered there.

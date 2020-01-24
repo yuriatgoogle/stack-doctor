@@ -10,15 +10,18 @@ function sleep (n) {
 }
 
 // set up prometheus 
-const app = express()
+const prometheusPort = 8081;
+const app = express();
 const meter = new MeterRegistry().getMeter('example-prometheus');
 const exporter = new PrometheusExporter(
   {
     startServer: true,
-    port: 8081
+    port: prometheusPort
   },
   () => {
-    console.log("prometheus scrape endpoint: http://localhost:8080/metrics");
+    console.log("prometheus scrape endpoint: http://localhost:"
+      + prometheusPort 
+      + "/metrics");
   }
 );
 meter.addExporter(exporter);
