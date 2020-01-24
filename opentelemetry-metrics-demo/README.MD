@@ -128,6 +128,7 @@ I verified that Prometheus was working by using `port-forward`:
 Finally, I patched the Prometheus server with the Stackdriver sidecar following the instructions in the [documentation](https://cloud.google.com/monitoring/kubernetes-engine/prometheus#configuration).  At this point, I was able to see Prometheus metrics in Stackdriver:
 
 ![image]()
+> Note that I had to use `kubectl describe deployment` to figure out the right value for $DATA_VOLUME.
 
 ## Deploying the app
 I created a simple Dockerfile:
@@ -148,3 +149,38 @@ EXPOSE 8080 8081
 CMD [ "node", "app.js" ]
 ```
 I built the image using `gcloud builds submit` and created a deployment file:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ot-metrics-deployment
+  labels:
+    app: opentelemetry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opentelemetry
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"      # must be quoted
+        prometheus.io/port: "8081" # must be quoted
+        prometheus.io/path: "/metrics"      # it defaults to /metrics
+      labels:
+        app: opentelemetry
+    spec:
+      containers:
+      - name: opentelemetry-server
+        image: gcr.io/stack-doctor/ot-metrics-demo:latest
+        ports:
+        - containerPort: 8080
+```
+Next, I used `kubectl apply -f` to create the app and `kubectl expose deployment --type=LoadBalancer` to make it externally available.  Once the external IP address was available, I configured a Stackdriver Uptime Check against it to generate a steady stream of traffic.  
+
+# Metrics in Prometheus
+At this point, all of the setup was done.  I accessed Prometheus again to confirm that the metrics I created using OpenTelemetry were available:
+
+![image](https://github.com/yuriatgoogle/stack-doctor/raw/master/opentelemetry-metrics-demo/images/metricsinprom.png)
+

@@ -11,6 +11,10 @@ spec:
       app: opentelemetry
   template:
     metadata:
+      annotations:
+        prometheus.io/scrape: "true"      # must be quoted
+        prometheus.io/port: "8081" # must be quoted
+        prometheus.io/path: "/metrics"      # it defaults to /metrics
       labels:
         app: opentelemetry
     spec:
