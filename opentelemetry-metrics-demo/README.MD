@@ -125,10 +125,6 @@ I verified that Prometheus was working by using `port-forward`:
 
 ![image](https://github.com/yuriatgoogle/stack-doctor/raw/master/opentelemetry-metrics-demo/images/prometheus.png)
 
-Finally, I patched the Prometheus server with the Stackdriver sidecar following the instructions in the [documentation](https://cloud.google.com/monitoring/kubernetes-engine/prometheus#configuration).  At this point, I was able to see Prometheus metrics in Stackdriver:
-
-![image]()
-> Note that I had to use `kubectl describe deployment` to figure out the right value for $DATA_VOLUME.
 
 ## Deploying the app
 I created a simple Dockerfile:
@@ -184,3 +180,12 @@ At this point, all of the setup was done.  I accessed Prometheus again to confir
 
 ![image](https://github.com/yuriatgoogle/stack-doctor/raw/master/opentelemetry-metrics-demo/images/metricsinprom.png)
 
+# What have I learned?
+## Data model
+In my OpenCensus [exercise](https://github.com/yuriatgoogle/stack-doctor/blob/master/opencensus-metrics/node/app.js), I learned about using primitives like Views, Measurements, and Measures.  I also learned how to create histograms and control aggregation.  My very limited experience with OpenTelemetry has shown that this model seems to be somewhat simpler.  In this exercise, I simply defined metrics and et their value when necessary.  The exporter took care of the rest.  While I imagine I have probably missed out on a lot of detail, this initial experience makes things seem quite a bit easier to get started with.
+
+## Exporters
+I've also realized that the project is still in relatively early stages.  For examples, there are no Stackdriver metric exporters available as I'm writing this.  Trace exporters have been written for (at least) Go and Node.js, but metrics are not yet available.  As such, Using this on GCP would require me to setup the Prometheus/Stackdriver integration using these [instructions](https://cloud.google.com/monitoring/kubernetes-engine/prometheus#configuration)
+
+## In conclusion...
+I greatly enjoyed learning how to use OpenTelemetry to create custom metric telemetry - using it to instrument my app to expose the "golden signals" was quite straightforward, thanks largely to the excellent examples provided in the OpenTelemetry Github repo.  Thanks for reading - come back next time when I attempt to use OpenTelemetry to integrate tracing and logs in Stackdriver!
