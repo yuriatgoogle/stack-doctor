@@ -86,3 +86,41 @@ When I run the app locally, I can then hit the `/metrics` endpoint and see the m
 ![image](https://github.com/yuriatgoogle/stack-doctor/raw/master/opentelemetry-metrics-demo/images/metricsendpoint.png))
 
 # Deploying the app
+Now I'm ready to run the app and generate actual traffic to it.  I'm going to 
+* create a GKE cluster
+* install Prometheus on it
+* deploy the app and configure the `/metrics` endpoint to be scraped
+
+Let's dive in!
+
+## Creating the cluster
+I took a very straightforward approach and used the Console to create a single-node cluster using an n1-standard node. I then used `gcloud container clusters get-credentials <cluster> --zone=<zone>` to get credentials for it to be able to access it from my local workstaton.
+
+```bash
+> kubectl get nodes
+NAME                                     STATUS   ROLES    AGE     VERSION
+gke-small-cluster-pool-1-b40da891-fc1p   Ready    <none>   7h27m   v1.15.7-gke.23
+```
+## Installing Prometheus
+I took the simple option here:
+```bash
+brew install helm # install helm, the package manager for Kubernetes
+helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+helm repo update
+helm install prometheus stable/prometheus
+```
+That was enough to get Prometheus up and running, but I had to increase the size of my cluster to get enough CPU to run everything.
+```bash
+> kubectl get pods
+NAME                                            READY   STATUS    RESTARTS   AGE
+prometheus-alertmanager-77995478d8-lh4c5        2/2     Running   0          6m34s
+prometheus-kube-state-metrics-f96cbbf97-vc56g   1/1     Running   0          6m34s
+prometheus-node-exporter-8xlwp                  1/1     Running   0          114s
+prometheus-node-exporter-s2pnt                  1/1     Running   0          6m34s
+prometheus-node-exporter-xbtrs                  1/1     Running   0          112s
+prometheus-pushgateway-747dc5fb57-rw72p         1/1     Running   0          6m34s
+prometheus-server-6f7467bfdd-5vfgx              2/2     Running   0          6m34s
+```
+I verified that Prometheus was working by using `port-forward`:
+
+![image]()
