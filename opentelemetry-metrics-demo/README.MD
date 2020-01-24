@@ -49,7 +49,7 @@ const responseLatency = meter.createGauge("response_latency", {
 });
 const labels = meter.labels({ metricOrigin: process.env.ENV});
 ```
-In the next part, I define the three metrics I want to track.  Request count and error count are both monotonic counters, in that they can only be increased.  Response latency is a non-monotonic gauge, since I want to track latency for every request.  I am also using a single label - I could not figure how to get metrics to work properly with no labels (in the next section).
+In the next part, I define the three metrics I want to track.  Request count and error count are both monotonic counters, meaning that they can only be increased.  Response latency is a non-monotonic gauge, since I want to track latency for every request.  I am also using a single label because I could not figure how to get metrics to work properly with no labels.
 
 ### Request handling
 ```go
@@ -78,23 +78,23 @@ app.get('/', (req, res) => {
 
 app.listen(8080, () => console.log(`Example app listening on port 8080!`))
 ```
-Finally, I'm ready to accept incoming requests.  Requests to `:8081/metrics` will be handled by Prometheus, and I'm using Express to handle requests to `:8080/`. For every request, I create a timer (`measuredLatency`) and keep it running until I'm ready to respond.  I generate a random number between 0 and 100 and use it to return an error half the time, in which case latency is not reported.  If there's no error to return, I `sleep` for another random value (between 0 and 10 seconds), take another time snapshot, calculate the elapsed time, and return that value as the latency.
+At this point, the app is ready to accept incoming requests.  Requests to `:8081/metrics` will be handled by Prometheus, and I'm using Express to handle requests to `:8080/`. For every request, the app creates a timer (`measuredLatency`) and keeps it running until it's ready to respond.  It generates a random number between 0 and 100 and uses it to return an error half the time, in which case latency is not reported.  If there's no error to return, the apps `sleeps` between 1 and 10 seconds, takes another time snapshot, calculates the elapsed time, and returns that value as the latency.
 
 ### Metrics endpoint
-When I run the app locally, I can then hit the `/metrics` endpoint and see the metrics I've registered there.
+When I run the app locally, I can then hit the `/metrics` endpoint and see the metrics I've registered there:
 
 ![image](https://github.com/yuriatgoogle/stack-doctor/raw/master/opentelemetry-metrics-demo/images/metricsendpoint.png)
 
 # Deploying the app
-Now I'm ready to run the app and generate actual traffic to it.  I'm going to 
-* create a GKE cluster
-* install Prometheus on it
-* deploy the app and configure the `/metrics` endpoint to be scraped
+At this point, I was ready to run the app and generate actual traffic to it.  That required:
+* creating a GKE cluster
+* installing Prometheus on it
+* deploying the app and configure the `/metrics` endpoint to be scraped
 
 Let's dive in!
 
 ## Creating the cluster
-I took a very straightforward approach and used the Console to create a single-node cluster using an n1-standard node. I then used `gcloud container clusters get-credentials <cluster> --zone=<zone>` to get credentials for it to be able to access it from my local workstaton.
+I took a very straightforward approach and used the Cloud Console to create a single-node cluster (that turned out to be the wrong choice) using an n1-standard node. I then used `gcloud container clusters get-credentials <cluster> --zone=<zone>` to get credentials for it to be able to access it from my local workstaton.
 
 ```bash
 $ kubectl get nodes
@@ -182,10 +182,10 @@ At this point, all of the setup was done.  I accessed Prometheus again to confir
 
 # What have I learned?
 ## Data model
-In my OpenCensus [exercise](https://github.com/yuriatgoogle/stack-doctor/blob/master/opencensus-metrics/node/app.js), I learned about using primitives like Views, Measurements, and Measures.  I also learned how to create histograms and control aggregation.  My very limited experience with OpenTelemetry has shown that this model seems to be somewhat simpler.  In this exercise, I simply defined metrics and et their value when necessary.  The exporter took care of the rest.  While I imagine I have probably missed out on a lot of detail, this initial experience makes things seem quite a bit easier to get started with.
+In my OpenCensus [exercise](https://github.com/yuriatgoogle/stack-doctor/blob/master/opencensus-metrics/node/app.js), I learned about using primitives like Views, Measurements, and Measures.  I also learned how to create histograms and control aggregation.  My very limited experience with OpenTelemetry has shown that this model seems to be somewhat simpler.  In this exercise, I simply defined metrics and set their value when necessary.  The exporter took care of the rest.  While I probably missed out on a lot of detail, this initial experience makes things seem quite a bit easier to get started with, which is great for folks just getting started with this kind of instrumentation.
 
 ## Exporters
-I've also realized that the project is still in relatively early stages.  For examples, there are no Stackdriver metric exporters available as I'm writing this.  Trace exporters have been written for (at least) Go and Node.js, but metrics are not yet available.  As such, Using this on GCP would require me to setup the Prometheus/Stackdriver integration using these [instructions](https://cloud.google.com/monitoring/kubernetes-engine/prometheus#configuration)
+I've also realized that the project is still in relatively early stages.  For example, there are no Stackdriver metric exporters available as I'm writing this.  Trace exporters have been written for (at least) Go and Node.js, but metrics are not yet available.  As such, Using this on GCP would require me to setup the Prometheus/Stackdriver integration using these [instructions](https://cloud.google.com/monitoring/kubernetes-engine/prometheus#configuration)
 
 ## In conclusion...
 I greatly enjoyed learning how to use OpenTelemetry to create custom metric telemetry - using it to instrument my app to expose the "golden signals" was quite straightforward, thanks largely to the excellent examples provided in the OpenTelemetry Github repo.  Thanks for reading - come back next time when I attempt to use OpenTelemetry to integrate tracing and logs in Stackdriver!
