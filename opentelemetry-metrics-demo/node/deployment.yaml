@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ot-metrics-deployment
+  labels:
+    app: opentelemetry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opentelemetry
+  template:
+    metadata:
+      labels:
+        app: opentelemetry
+    spec:
+      containers:
+      - name: opentelemetry-server
+        image: gcr.io/stack-doctor/ot-metrics-demo:latest
+        ports:
+        - containerPort: 8080

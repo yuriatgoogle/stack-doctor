@@ -83,7 +83,7 @@ Finally, I'm ready to accept incoming requests.  Requests to `:8081/metrics` wil
 ### Metrics endpoint
 When I run the app locally, I can then hit the `/metrics` endpoint and see the metrics I've registered there.
 
-![image](https://github.com/yuriatgoogle/stack-doctor/raw/master/opentelemetry-metrics-demo/images/metricsendpoint.png))
+![image](https://github.com/yuriatgoogle/stack-doctor/raw/master/opentelemetry-metrics-demo/images/metricsendpoint.png)
 
 # Deploying the app
 Now I'm ready to run the app and generate actual traffic to it.  I'm going to 
@@ -97,17 +97,17 @@ Let's dive in!
 I took a very straightforward approach and used the Console to create a single-node cluster using an n1-standard node. I then used `gcloud container clusters get-credentials <cluster> --zone=<zone>` to get credentials for it to be able to access it from my local workstaton.
 
 ```bash
-> kubectl get nodes
+$ kubectl get nodes
 NAME                                     STATUS   ROLES    AGE     VERSION
 gke-small-cluster-pool-1-b40da891-fc1p   Ready    <none>   7h27m   v1.15.7-gke.23
 ```
 ## Installing Prometheus
 I took the simple option here:
 ```bash
-brew install helm # install helm, the package manager for Kubernetes
-helm repo add stable https://kubernetes-charts.storage.googleapis.com/
-helm repo update
-helm install prometheus stable/prometheus
+$ brew install helm # install helm, the package manager for Kubernetes
+$ helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+$ helm repo update
+$ helm install prometheus stable/prometheus
 ```
 That was enough to get Prometheus up and running, but I had to increase the size of my cluster to get enough CPU to run everything.
 ```bash
@@ -123,4 +123,28 @@ prometheus-server-6f7467bfdd-5vfgx              2/2     Running   0          6m3
 ```
 I verified that Prometheus was working by using `port-forward`:
 
+![image](https://github.com/yuriatgoogle/stack-doctor/raw/master/opentelemetry-metrics-demo/images/prometheus.png)
+
+Finally, I patched the Prometheus server with the Stackdriver sidecar following the instructions in the [documentation](https://cloud.google.com/monitoring/kubernetes-engine/prometheus#configuration).  At this point, I was able to see Prometheus metrics in Stackdriver:
+
 ![image]()
+
+## Deploying the app
+I created a simple Dockerfile:
+```Dockerfile
+FROM node:10
+
+# Create app directory
+WORKDIR /usr/src/app
+
+# Install app dependencies
+COPY package*.json ./
+RUN npm install
+
+# Bundle app source
+COPY . .
+
+EXPOSE 8080 8081
+CMD [ "node", "app.js" ]
+```
+I built the image using `gcloud builds submit` and created a deployment file:
