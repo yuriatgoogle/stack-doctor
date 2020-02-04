@@ -16,20 +16,24 @@ import (
 	"go.opentelemetry.io/otel/api/distributedcontext"
 	"go.opentelemetry.io/otel/api/global"
 
-	// "go.opentelemetry.io/otel/api/key"
+	"cloud.google.com/go/logging"
 	logs "github.com/GoogleCloudPlatform/opencensus-spanner-demo/applog"
-	"go.opentelemetry.io/otel/api/trace"
+
+	trace "go.opentelemetry.io/otel/api/trace"
 	"go.opentelemetry.io/otel/exporter/trace/stackdriver"
 	"go.opentelemetry.io/otel/plugin/httptrace"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
 var (
-	projectID   = os.Getenv("PROJECT_ID")
-	backendAddr = "https://www.google.com"
-	location    = os.Getenv("LOCATION")
-	env         = os.Getenv("ENV")
+	projectID     = os.Getenv("PROJECT_ID")
+	backendAddr   = "https://www.google.com"
+	location      = os.Getenv("LOCATION")
+	env           = os.Getenv("ENV")
+	loggingClient *logging.Client
 )
+
+const LOGNAME string = "ot-logs-traces"
 
 func mainHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -38,7 +42,7 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 	client := http.DefaultClient
 	ctx := distributedcontext.NewContext(context.Background())
 
-	var body []byte // try deleting?
+	var body []byte
 
 	err := tr.WithSpan(ctx, "incoming call", // root span here
 		func(ctx context.Context) error {
@@ -46,12 +50,14 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 			// create span for internal processing and backend
 			ctx, processSpan := tr.Start(ctx, "process and query")
 			processSpan.AddEvent(ctx, "process and query")
+
 			// do some delay
 			rand.Seed(time.Now().UnixNano())
 			n := rand.Intn(10) // n will be between 0 and 10
 			log.Printf("sleeping for: %d\n", n)
 			time.Sleep(time.Duration(n) * time.Second)
-			logs.Printf(ctx, "The process took %d seconds\n", n)
+			printWithTrace(ctx, "The process took %d seconds\n", n)
+
 			// create another child span for the query
 			log.Printf("making backend request")
 			ctx, querySpan := tr.Start(ctx, "query")
@@ -68,6 +74,8 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				panic(err)
 			}
+			// log query
+			printWithTrace(ctx, "Backend response: %d\n", res.StatusCode)
 			body, err = ioutil.ReadAll(res.Body)
 			_ = res.Body.Close()
 
@@ -87,8 +95,46 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func initTracer() {
+// Send to Cloud Logging service including reference to current span
+func printWithTrace(ctx context.Context, format string, v ...interface{}) {
+	printf(ctx, logging.Info, format, v...)
+}
 
+// Send to Cloud Logging service including reference to current span
+func printf(ctx context.Context, severity logging.Severity, format string,
+	v ...interface{}) {
+	span := trace.SpanFromContext(ctx)
+	sCtx := span.SpanContext()
+	tr := sCtx.TraceIDString()
+	lg := loggingClient.Logger(LOGNAME)
+	trace := fmt.Sprintf("projects/%s/traces/%s", projectID, tr)
+	lg.Log(logging.Entry{
+		Severity: severity,
+		Payload:  fmt.Sprintf(format, v...),
+		Trace:    trace,
+		SpanID:   sCtx.SpanIDString(),
+	})
+}
+
+func main() {
+	initTracer()
+	logs.Initialize(projectID)
+	defer logs.Close()
+	initLogger()
+	defer closeLogger()
+
+	r := mux.NewRouter()
+	r.HandleFunc("/", mainHandler)
+
+	if env == "LOCAL" {
+		http.ListenAndServe("localhost:8080", r)
+	} else {
+		http.ListenAndServe(":8080", r)
+	}
+}
+
+// helper functions down here
+func initTracer() {
 	// Create Stackdriver exporter to be able to retrieve
 	// the collected spans.
 	exporter, err := stackdriver.NewExporter(
@@ -108,15 +154,22 @@ func initTracer() {
 	global.SetTraceProvider(tp)
 }
 
-func main() {
-	initTracer()
+// Initialize the Cloud Logging client
+func initLogger() {
+	ctx := context.Background()
+	var err error
+	loggingClient, err = logging.NewClient(ctx, projectID)
+	if err != nil {
+		fmt.Printf("Failed to create logging client: %v", err)
+		return
+	}
+	fmt.Printf("Stackdriver Logging initialized with project id %s, see Cloud "+
+		" Console under GCE VM instance > all instance_id\n", projectID)
+}
 
-	r := mux.NewRouter()
-	r.HandleFunc("/", mainHandler)
-
-	if env == "LOCAL" {
-		http.ListenAndServe("localhost:8080", r)
-	} else {
-		http.ListenAndServe(":8080", r)
+func closeLogger() {
+	err := loggingClient.Close()
+	if err != nil {
+		fmt.Printf("Failed to close logging client: %v", err)
 	}
 }
