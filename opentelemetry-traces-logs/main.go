@@ -17,7 +17,6 @@ import (
 	"go.opentelemetry.io/otel/api/global"
 
 	"cloud.google.com/go/logging"
-	logs "github.com/GoogleCloudPlatform/opencensus-spanner-demo/applog"
 
 	trace "go.opentelemetry.io/otel/api/trace"
 	"go.opentelemetry.io/otel/exporter/trace/stackdriver"
@@ -118,8 +117,6 @@ func printf(ctx context.Context, severity logging.Severity, format string,
 
 func main() {
 	initTracer()
-	logs.Initialize(projectID)
-	defer logs.Close()
 	initLogger()
 	defer closeLogger()
 
