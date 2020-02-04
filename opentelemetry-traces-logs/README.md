@@ -104,3 +104,26 @@ func printf(ctx context.Context, severity logging.Severity, format string,
 }
 ```
 In Stackdriver, traces and logs can be connected by writing the span ID and the trace ID in the payload of the log message.  Here, I'm using the context to extract both the span and trace and then extract their IDs.  I then write them to the log payload.  Here's what a resulting log message looks like:
+
+![image](https://github.com/yuriatgoogle/stack-doctor/raw/master/opentelemetry-traces-logs/images/logentry.png)
+
+Notice the `spanId` and `trace` fields.
+
+## Viewing traces
+
+I can run the app locally (after using `gcloud auth application-default login` to write default credentials) and send traffic to http://localhost:8080.  Here's the resulting trace:
+
+![image](https://github.com/yuriatgoogle/stack-doctor/raw/master/opentelemetry-traces-logs/images/trace.png)
+
+> Note that the trace contains both Events - added with the `span.AddEvent()` method - and logs, written as described above.
+
+## Viewing logs
+
+I can click on one of the log entries to see the full details of the log message:
+
+![image](https://github.com/yuriatgoogle/stack-doctor/raw/master/opentelemetry-traces-logs/images/tracewithlogs.png)
+
+I can then click Open in Logs Viewer and see this log entry there:
+
+![image](https://github.com/yuriatgoogle/stack-doctor/raw/master/opentelemetry-traces-logs/images/logs.png)
+
