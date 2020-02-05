@@ -2,11 +2,11 @@
 
 One of the main benefits of using an all-in-one observability suite like Stackdriver is that it provides all of the capabilities you may need.  Specifically, your metrics, traces, and logs are all in one place, and with the GA [release](https://cloud.google.com/monitoring/docs/monitoring_in_console) of Monitoring in the Cloud Console, that's more true than ever before. However, for the most part, each of these data elements are still mostly independent, and I wanted to attempt to try to unify two of them - traces and logs.
 
-The idea for the project was inspired by the excellent work [Alex Amies](https://github.com/alexamies) did in his [Reference Guide](https://cloud.google.com/solutions/troubleshooting-app-latency-with-cloud-spanner-and-opencensus) on using OpenCensus to measure Spanner performance and troubleshoot latency.  Specifically, he included an applog [package](https://github.com/GoogleCloudPlatform/opencensus-spanner-demo/tree/master/applog) that integrated traces and logs in OpenCensus.  
+The idea for the project was inspired by the excellent work [Alex Amies](https://github.com/alexamies) did in his [Reference Guide](https://cloud.google.com/solutions/troubleshooting-app-latency-with-cloud-spanner-and-opencensus) on using OpenCensus to measure Spanner performance and troubleshoot latency.  Specifically, he included an applog [package](https://github.com/GoogleCloudPlatform/opencensus-spanner-demo/tree/master/applog) that integrated traces and logs in OpenCensus:  
 
 ![image](https://cloud.google.com/solutions/images/troubleshooting-app-latency-with-cloud-spanner-and-opencensus-7-trace-log.png)
 
-I wanted to follow my [post](https://dev.to/yurigrinshteyn/distributed-tracing-with-opentelemetry-in-go-473h) on tracing with OpenTelemetry and reproduce his work using OpenTelemetry, rather than OpenCensus.  Let's dive in!
+I wanted to follow my [post](https://dev.to/yurigrinshteyn/distributed-tracing-with-opentelemetry-in-go-473h) on tracing with OpenTelemetry and attempt to create integrated traces and logs.  Let's dive in!
 
 ## The app
 
@@ -63,7 +63,7 @@ func initTracer() {
 The tracing set up is pretty straightforward - I'm simply using the exporter written by [Yoshi Yamaguchi](https://github.com/ymotongpoo), a fantastic Developer Advocate.  It's the same exporter I used in my post on tracing without any changes.
 
 ### Logging setup
-This is where things get interesting.
+This is where things start to get interesting.
 ```go
 func initLogger() {
 	ctx := context.Background()
@@ -80,7 +80,7 @@ func initLogger() {
 I've largely lifted this from Alex's [work](https://github.com/GoogleCloudPlatform/opencensus-spanner-demo/blob/master/applog/applog.go).  The init function simply sets up the logging client.
 
 ### Writing logs
-This is where the integration really happens.
+This is where the trace/logging integration really happens.
 ```go
 // Send to Cloud Logging service including reference to current span
 func printWithTrace(ctx context.Context, format string, v ...interface{}) {
@@ -107,13 +107,14 @@ In Stackdriver, traces and logs can be connected by writing the span ID and the 
 
 ![image](https://github.com/yuriatgoogle/stack-doctor/raw/master/opentelemetry-traces-logs/images/logentry.png)
 
-Notice the `spanId` and `trace` fields.
+Notice that the `spanId` and `trace` fields are populated appropriately.
 
 ## Viewing traces
 
-I can run the app locally (after using `gcloud auth application-default login` to write default credentials) and send traffic to http://localhost:8080.  Here's the resulting trace:
+I can run the app locally (after using `gcloud auth application-default login` to write default credentials) and send traffic to http://localhost:8080.  Here's a resulting trace:
 
 ![image](https://github.com/yuriatgoogle/stack-doctor/raw/master/opentelemetry-traces-logs/images/trace.png)
+
 
 > Note that the trace contains both Events - added with the `span.AddEvent()` method - and logs, written as described above.
 
@@ -128,4 +129,4 @@ I can then click Open in Logs Viewer and see this log entry there:
 ![image](https://github.com/yuriatgoogle/stack-doctor/raw/master/opentelemetry-traces-logs/images/logs.png)
 
 ## In conclusion...
-I was very glad to see that this somewhat underappreciated functionality from OpenCensus still works in OpenTelemetry with minor changes.  Specifically, I had to find the new APIs to use in `printf()` to extract the span from context and then get its span ID and trace ID, and this does not seem to be well documented.  With that said, I hope this brief tutorial is useful to others looking to build a more integrated approach to observability with Stackdriver, especially in distributed systems.  Thanks for reading!
+I was very glad to see that this somewhat underappreciated functionality from OpenCensus still works in OpenTelemetry with minor changes.  Specifically, I had to find the new APIs to use in `printf()` to extract the span from context and then get its span ID and trace ID, and this does not seem to be well documented.  With that said, I hope this brief tutorial is useful to others looking to build a more integrated approach to observability with Stackdriver, especially in distributed systems.  Many thanks for Alex for doing the original work on this, and thank you for reading!
