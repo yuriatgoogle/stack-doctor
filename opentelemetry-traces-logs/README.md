@@ -127,3 +127,5 @@ I can then click Open in Logs Viewer and see this log entry there:
 
 ![image](https://github.com/yuriatgoogle/stack-doctor/raw/master/opentelemetry-traces-logs/images/logs.png)
 
+## In conclusion...
+I was very glad to see that this somewhat underappreciated functionality from OpenCensus still works in OpenTelemetry with minor changes.  Specifically, I had to find the new APIs to use in `printf()` to extract the span from context and then get its span ID and trace ID, and this does not seem to be well documented.  With that said, I hope this brief tutorial is useful to others looking to build a more integrated approach to observability with Stackdriver, especially in distributed systems.  Thanks for reading!
