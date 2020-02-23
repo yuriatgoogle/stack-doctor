@@ -26,5 +26,5 @@ func main() {
 
 	})
 
-	http.ListenAndServe(":8080", r)
+	http.ListenAndServe(":80", r)
 }
