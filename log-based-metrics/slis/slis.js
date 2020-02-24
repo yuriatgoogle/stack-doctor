@@ -14,7 +14,7 @@ const loggingBunyan = new LoggingBunyan();
 // Create a Bunyan logger that streams to Stackdriver Logging
 // Logs will be written to: "projects/YOUR_PROJECT_ID/logs/bunyan_log"
 const logger = bunyan.createLogger({
-  name: 'node-example',
+  name: 'sli-log',
   streams: [
     // Log to the console at 'info' and above
     {stream: process.stdout, level: 'info'},

@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: errors-deployment
+  name: lbm-slis-deployment
   labels:
-    app: errors
+    app: lbm-slis
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: errors
+      app: lbm-slis
   template:
     metadata:
       labels:
-        app: errors
+        app: lbm-slis
     spec:
       containers:
-      - name: errors-server
-        image: gcr.io/stack-doctor/log-based-metrics-errors:latest
+      - name: lbm-slis-server
+        image: gcr.io/next-2020-ops102/log-based-metrics-slis:latest
         ports:
         - containerPort: 8080
