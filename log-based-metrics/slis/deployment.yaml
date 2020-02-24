@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: errors-deployment
+  labels:
+    app: errors
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: errors
+  template:
+    metadata:
+      labels:
+        app: errors
+    spec:
+      containers:
+      - name: errors-server
+        image: gcr.io/stack-doctor/log-based-metrics-errors:latest
+        ports:
+        - containerPort: 8080
