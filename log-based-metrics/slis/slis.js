@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const sleep = require('sleep');
+
 
 // set up Stackdriver logging
 const bunyan = require('bunyan');
@@ -23,11 +23,15 @@ const logger = bunyan.createLogger({
   ],
 });
 
+function sleep (n) {
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, n);
+}
+
 app.get('/', (req, res) => {
     console.log("request made");
     // add random delay
     randomDelay = Math.floor(Math.random() * 1000);
-    sleep.msleep(randomDelay);
+    sleep(randomDelay);
     logger.info("slept for " + randomDelay + " ms");
     
     // log error 5% of the time
