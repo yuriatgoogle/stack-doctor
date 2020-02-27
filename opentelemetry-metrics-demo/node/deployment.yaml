@@ -20,6 +20,6 @@ spec:
     spec:
       containers:
       - name: opentelemetry-server
-        image: gcr.io/stack-doctor/ot-metrics-demo:latest
+        image: gcr.io/next-2020-ops102/ot-metrics-demo:latest
         ports:
         - containerPort: 8080

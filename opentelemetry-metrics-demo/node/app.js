@@ -53,8 +53,8 @@ app.get('/', (req, res) => {
     console.log('request made');
     // increment total requests counter
     requestCount.bind(labels).add(1);
-    // return an error 1% of the time
-    if ((Math.floor(Math.random() * 100)) > 50) {
+    // return an error 2% of the time
+    if ((Math.floor(Math.random() * 100)) > 98) {
         // increment error counter
         errorCount.bind(labels).add(1);
         // return error code
