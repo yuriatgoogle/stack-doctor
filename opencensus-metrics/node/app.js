@@ -59,12 +59,12 @@ const latency_metric = globalStats.createView(
     [],
     'Server response latency distribution',
     // Latency in buckets:
-    [0, 100, 500, 1000]
+    [0, 1000, 2000, 3000, 4000, 5000, 10000]
   );
 globalStats.registerView(latency_metric);
 
-// set up the Stackdriver exporter
-const projectId = 'stack-doctor';
+// set up the Stackdriver exporter - hardcoding the project is bad!
+const projectId = 'next-2020-ops102';
 
 // GOOGLE_APPLICATION_CREDENTIALS are expected by a dependency of this code
 // Not this code itself. Checking for existence here but not retaining (as not needed)
