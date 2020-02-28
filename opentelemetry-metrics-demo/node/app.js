@@ -60,13 +60,21 @@ app.get('/', (req, res) => {
         // return error code
         res.status(500).send("error!")
     } 
+    // make it slow an additional 2% of the time
+    else if ((Math.floor(Math.random() * 100)) > 98) {
+      // delay for a bit
+      sleep(Math.floor(Math.random()*10000));
+      // record response latency
+      const measuredLatency = new Date().getTime() - requestReceived;
+      responseLatency.bind(labels).set(measuredLatency)
+      res.status(200).send("delayed success in " + measuredLatency + " ms")
+    }
+    // record latency and respond right away
     else {
-        // delay for a bit
-        sleep(Math.floor(Math.random()*10000));
-        // record response latency
-        const measuredLatency = new Date().getTime() - requestReceived;
-        responseLatency.bind(labels).set(measuredLatency)
-        res.status(200).send("success in " + measuredLatency + " ms")
+      sleep(Math.floor(Math.random()*1000));
+      const measuredLatency = new Date().getTime() - requestReceived;
+      responseLatency.bind(labels).set(measuredLatency)
+      res.status(200).send("did not delay - success in " + measuredLatency + " ms")
     }
 })
 
