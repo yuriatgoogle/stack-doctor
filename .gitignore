@@ -4,6 +4,7 @@ package-lock.json
 key.json
 *.mod
 main
-.terraform
+.terraform/*
+.terraform*
 *.tfstate
 *.backup
