@@ -35,7 +35,7 @@ spec:
         run: prometheus-demo-node
     spec:
       containers:
-      - image: docker.io/yurigrinshteyn/prometheus-demo-node:latest
+      - image: gcr.io/next-2020-ops102/prometheus-sli-demo:latest
         imagePullPolicy: Always
         name: prometheus-demo-node
         resources: {}

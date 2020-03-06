@@ -22,7 +22,7 @@ const nodeLatenciesHistogram = new prometheus.Histogram({
     name: 'node_request_latency',
     help: 'request latency by path',
     labelNames: ['route'],
-    buckets: [100, 400]
+    buckets: [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100]
 });
 
 // Probe every 5th second.
