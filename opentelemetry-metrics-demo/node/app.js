@@ -63,7 +63,7 @@ app.get('/', (req, res) => {
     // make it slow an additional 2% of the time
     else if ((Math.floor(Math.random() * 100)) > 98) {
       // delay for a bit
-      sleep(Math.floor(Math.random()*10000));
+      sleep(10000);
       // record response latency
       const measuredLatency = new Date().getTime() - requestReceived;
       responseLatency.bind(labels).set(measuredLatency)
