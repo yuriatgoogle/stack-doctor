@@ -1,5 +1,5 @@
 provider "google" {
-  project = "next-2020-ops302"
+  project = "stack-doctor"
   region  = "us-west3"
   zone    = "us-west3-a"
 }

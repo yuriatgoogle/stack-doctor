@@ -9,6 +9,8 @@ function sleep(n) {
   msleep(n*1000);
 }
 
+const projectId = 'next-2020-5thnine';
+
 // opencensus setup
 const {globalStats, MeasureUnit, AggregationType} = require('@opencensus/core');
 const {StackdriverStatsExporter} = require('@opencensus/exporter-stackdriver');
@@ -64,8 +66,6 @@ const latency_metric = globalStats.createView(
 globalStats.registerView(latency_metric);
 
 // set up the Stackdriver exporter - hardcoding the project is bad!
-const projectId = 'next-2020-ops102';
-
 // GOOGLE_APPLICATION_CREDENTIALS are expected by a dependency of this code
 // Not this code itself. Checking for existence here but not retaining (as not needed)
 if (!projectId || !process.env.GOOGLE_APPLICATION_CREDENTIALS) {

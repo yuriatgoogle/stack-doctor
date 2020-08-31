@@ -1,11 +1,11 @@
 provider "google" {
-  project = "next-2020-ops302"
+  project = "stack-doctor"
   region  = "us-west3"
   zone    = "us-west3-a"
 }
 
 resource "google_monitoring_uptime_check_config" "https" {
-  display_name = "GAE Uptime Check"
+  display_name = "Test Uptime Check"
   timeout = "60s"
 
   http_check {
@@ -18,12 +18,12 @@ resource "google_monitoring_uptime_check_config" "https" {
   monitored_resource {
     type = "uptime_url"
     labels = {
-      project_id = "next-2020-ops302"
-      host = "next-2020-ops302.appspot.com"
+      project_id = "stack-doctor"
+      host = "www.google.com"
     }
   }
 
   content_matchers {
-    content = "Hello World"
+    content = "lucky"
   }
 }

@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: opencensus-server
-        image: gcr.io/next-2020-ops102/opencensus-slis:latest
+        image: gcr.io/next-2020-5thnine/opencensus-slis:latest
         ports:
         - containerPort: 8080
