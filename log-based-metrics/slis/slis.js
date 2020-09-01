@@ -28,7 +28,7 @@ function sleep (n) {
 }
 
 app.get('/', (req, res) => {
-    console.log("request made");
+    logger.info("request made");
     // add random delay
     randomDelay = Math.floor(Math.random() * 1000);
     sleep(randomDelay);
