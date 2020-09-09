@@ -8,6 +8,7 @@ function sleep(n) {
   msleep(n*1000);
 }
 
+
 // opencensus setup
 const projectId = 'stack-doctor';
 const {globalStats, MeasureUnit, AggregationType} = require('@opencensus/core');
@@ -59,40 +60,49 @@ globalStats.registerExporter(exporter);
 
 
 app.get('/', (req, res) => {
-    
-    console.log("request made");
 
-    // record a request count for every request
+  // desired error rate
+  let ERROR_RATE = 0;
+  if (process.env.ERROR_RATE) {
+    ERROR_RATE = process.env.ERROR_RATE;
+  }
+  else {
+    ERROR_RATE = 0.1;
+  }
+    
+  console.log("request made");
+
+  // record a request count for every request
+  globalStats.record([
+      {
+        measure: REQUEST_COUNT,
+        value: 1,
+      },
+    ]);
+  
+  // throw an error based on desired error rate
+  var randomValue = Math.floor(Math.random() * (9) + 1);
+  if (randomValue >= (ERROR_RATE * 10)){
+    // record a failed request
     globalStats.record([
-        {
-          measure: REQUEST_COUNT,
-          value: 1,
-        },
-      ]);
-    
-    // randomly throw an error 10% of the time
-    var randomValue = Math.floor(Math.random() * (9) + 1);
-    if (randomValue == 1){
-      
-      // record a failed request
-      globalStats.record([
-        {
-          measure: ERROR_COUNT,
-          value: 1,
-        },
-      ]);
+      {
+        measure: ERROR_COUNT,
+        value: 1,
+      },
+    ]);
 
-      // return error
-      res.status(500).send("failure");
-    }
-    // end random error
+    // return error
+    res.status(500).send("failure");
+  }
 
-    // sleep for a random number of seconds
+  else {
+    // sleep for a bit
     randomValue = Math.floor(Math.random() * (9) + 1);
     sleep(randomValue/10);
 
-    // send successful response
+    // return success
     res.status(200).send("success after waiting for " + randomValue/10 + " seconds");
+    }
 })
 
 
