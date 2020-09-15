@@ -67,7 +67,8 @@ app.get('/', (req, res) => {
     ERROR_RATE = process.env.ERROR_RATE;
   }
   else {
-    ERROR_RATE = 0.1;
+    // 99% available by default
+    ERROR_RATE = 1;
   }
     
   console.log("request made");
@@ -81,8 +82,8 @@ app.get('/', (req, res) => {
     ]);
   
   // throw an error based on desired error rate
-  var randomValue = Math.floor(Math.random() * (9) + 1);
-  if (randomValue >= (ERROR_RATE * 10)){
+  var randomValue = Math.floor(Math.random() * Math.floor(100));
+  if (randomValue <= ERROR_RATE){
     // record a failed request
     globalStats.record([
       {

@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: opencensus-metrics-deployment
+  name: slo-alerting-demo-eployment
   labels:
-    app: opencensus
+    app: slo-alerting-demo
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: opencensus
+      app: slo-alerting-demo
   template:
     metadata:
       labels:
-        app: opencensus
+        app: slo-alerting-demo
     spec:
       containers:
-      - name: opencensus-server
-        image: gcr.io/next-2020-5thnine/opencensus-slis:latest
+      - name: slo-alerting-demo-server
+        image: gcr.io/stack-doctor/slo-alerting-demo:latest
         ports:
         - containerPort: 8080
