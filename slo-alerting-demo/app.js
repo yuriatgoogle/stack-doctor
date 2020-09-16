@@ -5,32 +5,36 @@ const express = require ('express');
 const app = express();
 const { MeterProvider } = require('@opentelemetry/metrics');
 const { MetricExporter } = require('@google-cloud/opentelemetry-cloud-monitoring-exporter');
+const {gcpDetector} = require('@opentelemetry/resource-detector-gcp');
+
+const ERROR_RATE = process.env.ERROR_RATE;
 
 function sleep (n) {
   Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, n);
 }
 
 const exporter = new MetricExporter();
-const ERROR_RATE = process.env.ERROR_RATE;
-
-// Register the exporter
-const meter = new MeterProvider({
-  exporter,
-  interval: 60000,
-}).getMeter('example-meter');
-
-// define metrics 
-const requestCount = meter.createCounter("request_count_sli", {
-  monotonic: true,
-  labelKeys: ["metricOrigin"],
-  description: "Counts total number of requests"
-});
-const errorCount = meter.createCounter("error_count_sli", {
-    monotonic: true,
-    labelKeys: ["metricOrigin"],
-    description: "Counts total number of errors"
-});
-// const labels = meter.labels({ metricOrigin: process.env.ENV});
+const {meter, requestCount, errorCount} = async function(x) {
+  let resource = await gcpDetector.detect()
+  // return (resource, rc, ec)
+    .then((resource) => {
+      meter = new MeterProvider({
+        exporter,
+        interval: 60000,
+        resource,
+      }).getMeter('example-meter');
+    })
+    .then((meter) => {
+      // define metrics 
+      requestCount = meter.createCounter("request_count_sli", {
+        description: "Counts total number of requests"
+      });
+      errorCount = meter.createCounter("error_count_sli", {
+          description: "Counts total number of errors"
+      });
+      return (meter, requestCount, errorCount);
+    })
+};
 
 // set metric values on request
 app.get('/', (req, res) => {
