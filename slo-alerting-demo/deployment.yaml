@@ -24,7 +24,5 @@ spec:
           - name: ERROR_RATE
             valueFrom:
               configMapKeyRef:
-                # The ConfigMap containing the value you want to assign to SPECIAL_LEVEL_KEY
                 name: error-rate
-                # Specify the key associated with the value
                 key: ERROR_RATE
