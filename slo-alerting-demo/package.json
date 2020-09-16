@@ -8,7 +8,7 @@
     "@opentelemetry/api": "^0.10.2",
     "@opentelemetry/core": "^0.10.2",
     "@opentelemetry/metrics": "^0.10.2",
-    "@opentelemetry/resource-detector-gcp": "^0.11.0",
+    "@opentelemetry/resource-detector-gcp": "0.10.3-alpha.28",
     "@opentelemetry/resources": "^0.10.2",
     "express": "^4.17.1"
   },
