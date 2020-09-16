@@ -7,6 +7,8 @@ const { MeterProvider } = require('@opentelemetry/metrics');
 const { MetricExporter } = require('@google-cloud/opentelemetry-cloud-monitoring-exporter');
 const {gcpDetector} = require('@opentelemetry/resource-detector-gcp');
 
+const ERROR_RATE = process.env.ERROR_RATE;
+
 function sleep (n) {
   Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, n);
 }
@@ -25,16 +27,11 @@ async function main() {
 
   // define metrics 
   const requestCount = meter.createCounter("request_count_sli", {
-    monotonic: true,
-    labelKeys: ["metricOrigin"],
     description: "Counts total number of requests"
   });
   const errorCount = meter.createCounter("error_count_sli", {
-      monotonic: true,
-      labelKeys: ["metricOrigin"],
       description: "Counts total number of errors"
   });
-  // const labels = meter.labels({ metricOrigin: process.env.ENV});
 
   // set metric values on request
   app.get('/', (req, res) => {
@@ -58,6 +55,3 @@ async function main() {
 
   app.listen(8080, () => console.log(`Example app listening on port 8080!`))
 }
-
-main();
-
