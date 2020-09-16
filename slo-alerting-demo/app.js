@@ -52,6 +52,7 @@ async function main() {
         res.status(200).send("success!")
       }
   })
-
   app.listen(8080, () => console.log(`Example app listening on port 8080!`))
 }
+
+main();
