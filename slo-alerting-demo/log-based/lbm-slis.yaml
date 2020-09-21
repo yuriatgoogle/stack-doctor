@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: slo-alerting-demo-deployment
+  name: lbm-slis-deployment
   labels:
-    app: slo-alerting-demo
+    app: lbm-slis
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: slo-alerting-demo
+      app: lbm-slis
   template:
     metadata:
       labels:
-        app: slo-alerting-demo
+        app: lbm-slis
     spec:
       containers:
-      - name: slo-alerting-demo-server
-        image: gcr.io/stack-doctor/slo-alerting-demo:latest
+      - name: lbm-slis-server
+        image: gcr.io/stack-doctor/lbm-slis:latest
         ports:
         - containerPort: 8080
         env:

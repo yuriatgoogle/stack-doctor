@@ -7,8 +7,6 @@ const { MeterProvider } = require('@opentelemetry/metrics');
 const { MetricExporter } = require('@google-cloud/opentelemetry-cloud-monitoring-exporter');
 const {gcpDetector} = require('@opentelemetry/resource-detector-gcp');
 
-const ERROR_RATE = process.env.ERROR_RATE;
-
 function sleep (n) {
   Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, n);
 }
