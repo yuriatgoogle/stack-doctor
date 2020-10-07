@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: restarting-deployment
+  labels:
+    app: restarting
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: restarting
+  template:
+    metadata:
+      labels:
+        app: restarting
+    spec:
+      containers:
+      - name: restarting-container
+        image: gcr.io/stack-doctor/crashing-demo
+        imagePullPolicy: IfNotPresent
+        ports:
+            - containerPort: 8080
