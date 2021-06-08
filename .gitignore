@@ -8,6 +8,7 @@ main
 .terraform*
 *.tfstate
 *.backup
+scratch.sh
 
 # Local .terraform directories
 **/.terraform/*

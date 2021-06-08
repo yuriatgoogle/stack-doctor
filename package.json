@@ -1,0 +1,24 @@
+{
+  "name": "stack-doctor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "cloudtrace.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yuriatgoogle/stack-doctor.git"
+  },
+  "author": "Yuri Grinshteyn",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/yuriatgoogle/stack-doctor/issues"
+  },
+  "homepage": "https://github.com/yuriatgoogle/stack-doctor#readme",
+  "dependencies": {
+    "@google-cloud/trace-agent": "^5.1.3",
+    "express": "^4.17.1",
+    "got": "^11.8.2"
+  }
+}

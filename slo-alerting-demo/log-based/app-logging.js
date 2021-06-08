@@ -10,11 +10,11 @@ app.get('/', (req, res) => {
     const ERROR_RATE = process.env.ERROR_RATE || 1;
     if (randomValue <= ERROR_RATE) {
         // log error
-        console.log("request failed!");
+        console.error("Status log - 500");
         // return error code
         res.status(500).send("error!")
     } else {
-      console.log("request succeeded!");
+      console.log("Status log - 200");
       res.status(200).send("success!");
     }
 })

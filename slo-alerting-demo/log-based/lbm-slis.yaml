@@ -15,14 +15,14 @@ spec:
         app: lbm-slis
     spec:
       containers:
-      - name: lbm-slis-server
-        image: gcr.io/stack-doctor/lbm-slis:latest
-        ports:
-        - containerPort: 8080
-        env:
-          # Define the environment variable
-          - name: ERROR_RATE
-            valueFrom:
-              configMapKeyRef:
-                name: error-rate
-                key: ERROR_RATE
+        - name: lbm-slis-server
+          image: gcr.io/ygrinshteyn-sandbox/slo-alerting:known-good
+          ports:
+            - containerPort: 8080
+          env:
+            # Define the environment variable
+            - name: ERROR_RATE
+              valueFrom:
+                configMapKeyRef:
+                  name: error-rate
+                  key: ERROR_RATE

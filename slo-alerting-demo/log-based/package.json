@@ -4,7 +4,8 @@
   "description": "",
   "main": "app-logging.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "run": "node app-logging.js"
   },
   "author": "Yuri Grinshteyn",
   "license": "Apache-2.0",

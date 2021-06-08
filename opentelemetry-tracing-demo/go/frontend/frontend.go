@@ -1,107 +1,96 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
-	"context"
-	"io/ioutil"
-	"google.golang.org/grpc/codes"
-	//"time"
 
 	"github.com/gorilla/mux"
 
-	"go.opentelemetry.io/otel/api/distributedcontext"
-	"go.opentelemetry.io/otel/api/global"
-	// "go.opentelemetry.io/otel/api/key"
-	"go.opentelemetry.io/otel/api/trace"
-	"go.opentelemetry.io/otel/exporter/trace/stackdriver"
-	"go.opentelemetry.io/otel/plugin/httptrace"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/baggage"
+	"go.opentelemetry.io/otel/codes"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	"go.opentelemetry.io/otel/semconv"
+	"go.opentelemetry.io/otel/trace"
+
+	texporter "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace"
 )
 
 var (
 	projectID   = os.Getenv("PROJECT_ID")
 	backendAddr = os.Getenv("BACKEND")
 	location    = os.Getenv("LOCATION")
-	env			= os.Getenv("ENV")
+	env         = os.Getenv("ENV")
 )
 
 func mainHandler(w http.ResponseWriter, r *http.Request) {
-	
-	tr := global.TraceProvider().Tracer("OT-tracing-demo")
 
-	client := http.DefaultClient
-	ctx := distributedcontext.NewContext(context.Background())
-	
+	tr := otel.Tracer("cloudtrace/example/client")
+
+	client := http.Client{Transport: otelhttp.NewTransport(http.DefaultTransport)}
+	ctx := baggage.ContextWithValues(context.Background(),
+		attribute.String("username", "donuts"),
+	)
+
 	var body []byte
 
-	err := tr.WithSpan(ctx, "incoming call",  // root span here
-		func(ctx context.Context) error {
-			
-			// create child span
-			ctx, childSpan := tr.Start(ctx, "backend call")
-			childSpan.AddEvent (ctx, "making backend call")
+	err := func(ctx context.Context) error { // Root span is created here.
 
-			// create backend request
-			req, _ := http.NewRequest("GET", backendAddr, nil)
+		// create child span
+		ctx, span := tr.Start(ctx, "Incoming request", trace.WithAttributes(semconv.PeerServiceKey.String("Frontend")))
+		defer span.End()
+		req, _ := http.NewRequestWithContext(ctx, "GET", "http://"+backendAddr, nil)
 
-			// inject context
-			ctx, req = httptrace.W3C(ctx, req)
-			httptrace.Inject(ctx, req)
+		fmt.Printf("Sending request...\n")
+		res, err := client.Do(req)
+		if err != nil {
+			panic(err)
+		}
+		body, err = ioutil.ReadAll(res.Body)
+		_ = res.Body.Close()
+		span.SetStatus(codes.Ok, "")
 
-			// do request
-			log.Printf("Sending request...\n")
-			res, err := client.Do(req)
-			if err != nil {
-				panic(err)
-			}
-			body, err = ioutil.ReadAll(res.Body)
-			_ = res.Body.Close()
-
-			// close child span
-			childSpan.End()
-
-			trace.SpanFromContext(ctx).SetStatus(codes.OK)
-			log.Printf("got response: %d\n", res.Status)
-			fmt.Printf("%v\n", "OK") //change to status code from backend
-			return err
-		})
+		log.Printf("got response: %d\n", res.Status)
+		fmt.Printf("%v\n", "OK") //change to status code from backend
+		return err
+	}(ctx)
 
 	if err != nil {
 		panic(err)
-	}	
+	}
 }
 
-func initTracer() {
+func initTracer() func() {
+	projectID := os.Getenv("PROJECT_ID")
 
-	// Create Stackdriver exporter to be able to retrieve
+	// Create Google Cloud Trace exporter to be able to retrieve
 	// the collected spans.
-	exporter, err := stackdriver.NewExporter(
-		stackdriver.WithProjectID(projectID),
+	_, shutdown, err := texporter.InstallNewPipeline(
+		[]texporter.Option{texporter.WithProjectID(projectID)},
+		// For this example code we use sdktrace.AlwaysSample sampler to sample all traces.
+		// In a production application, use sdktrace.ProbabilitySampler with a desired probability.
+		sdktrace.WithSampler(sdktrace.AlwaysSample()),
 	)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	// For the demonstration, use sdktrace.AlwaysSample sampler to sample all traces.
-	// In a production application, use sdktrace.ProbabilitySampler with a desired probability.
-	tp, err := sdktrace.NewProvider(sdktrace.WithConfig(sdktrace.Config{DefaultSampler: sdktrace.AlwaysSample()}),
-		sdktrace.WithSyncer(exporter))
-	if err != nil {
-		log.Fatal(err)
-	}
-	global.SetTraceProvider(tp)
+	return shutdown
 }
 
 func main() {
-	initTracer()
+	shutdown := initTracer()
+	defer shutdown()
 
 	r := mux.NewRouter()
 	r.HandleFunc("/", mainHandler)
-	
-	if (env=="LOCAL") {
+
+	if env == "LOCAL" {
 		http.ListenAndServe("localhost:8080", r)
 	} else {
 		http.ListenAndServe(":8080", r)
