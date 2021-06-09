@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/gorilla/mux"
+
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
@@ -41,7 +43,32 @@ func initTracer() func() {
 }
 
 func main() {
-	initTracer()
+	shutdown := initTracer()
+	defer shutdown()
+
+	helloHandler := func(w http.ResponseWriter, req *http.Request) {
+		ctx := req.Context()
+		span := trace.SpanFromContext(ctx)
+		span.AddEvent("handling backend request")
+
+		fmt.Printf("OK")
+	}
+	otelHandler := otelhttp.NewHandler(http.HandlerFunc(helloHandler), "Backend span")
+
+	r := mux.NewRouter()
+	r.Handle("/", otelHandler)
+
+	if env == "LOCAL" {
+		http.ListenAndServe("localhost:8081", r)
+	} else {
+		http.ListenAndServe(":8081", r)
+	}
+}
+
+/* this works
+func main() {
+	shutdown := initTracer()
+	defer shutdown()
 
 	helloHandler := func(w http.ResponseWriter, req *http.Request) {
 		ctx := req.Context()
@@ -58,35 +85,6 @@ func main() {
 		http.ListenAndServe("localhost:8081", nil)
 	} else {
 		http.ListenAndServe(":8081", nil)
-	}
-}
-
-/* func mainHandler(w http.ResponseWriter, req *http.Request) {
-	/* tr := otel.Tracer("Backend")
-	_, childSpan := tr.Start(req.Context(), "Backend Request", trace.WithAttributes(semconv.PeerServiceKey.String("Backend")))
-	defer childSpan.End()
-	ctx := req.Context()
-	span := trace.SpanFromContext(ctx)
-	span.AddEvent("handling backend")
-	// childSpan.AddEvent("handling backend call")
-
-	// output
-	log.Printf("backend call received")
-	fmt.Printf("OK")
-}
-
-func main() {
-	shutdown := initTracer()
-	defer shutdown()
-
-	r := mux.NewRouter()
-	otelHandler := otelhttp.NewHandler(mainHandler, "Hello")
-	r.HandleFunc("/", otelHandler)
-
-	if env == "LOCAL" {
-		http.ListenAndServe("localhost:8081", r)
-	} else {
-		http.ListenAndServe(":8081", r)
 	}
 }
 */
