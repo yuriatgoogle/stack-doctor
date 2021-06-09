@@ -1,14 +1,14 @@
 package main
 
 import (
-	"io"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 
-	"github.com/gorilla/mux"
-
-	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/trace"
 
@@ -36,15 +36,43 @@ func initTracer() func() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
 	return shutdown
 }
 
-func mainHandler(w http.ResponseWriter, req *http.Request) {
+func main() {
+	initTracer()
+
+	helloHandler := func(w http.ResponseWriter, req *http.Request) {
+		ctx := req.Context()
+		span := trace.SpanFromContext(ctx)
+		span.AddEvent("handling incoming request")
+
+		fmt.Printf("OK")
+	}
+
+	otelHandler := otelhttp.NewHandler(http.HandlerFunc(helloHandler), "Backend span")
+
+	http.Handle("/", otelHandler)
+	if env == "LOCAL" {
+		http.ListenAndServe("localhost:8081", nil)
+	} else {
+		http.ListenAndServe(":8081", nil)
+	}
+}
+
+/* func mainHandler(w http.ResponseWriter, req *http.Request) {
+	/* tr := otel.Tracer("Backend")
+	_, childSpan := tr.Start(req.Context(), "Backend Request", trace.WithAttributes(semconv.PeerServiceKey.String("Backend")))
+	defer childSpan.End()
 	ctx := req.Context()
 	span := trace.SpanFromContext(ctx)
-	span.SetAttributes(attribute.String("server", "handling this..."))
+	span.AddEvent("handling backend")
+	// childSpan.AddEvent("handling backend call")
 
-	_, _ = io.WriteString(w, "Hello, world!\n")
+	// output
+	log.Printf("backend call received")
+	fmt.Printf("OK")
 }
 
 func main() {
@@ -52,7 +80,8 @@ func main() {
 	defer shutdown()
 
 	r := mux.NewRouter()
-	r.HandleFunc("/", mainHandler)
+	otelHandler := otelhttp.NewHandler(mainHandler, "Hello")
+	r.HandleFunc("/", otelHandler)
 
 	if env == "LOCAL" {
 		http.ListenAndServe("localhost:8081", r)
@@ -60,3 +89,4 @@ func main() {
 		http.ListenAndServe(":8081", r)
 	}
 }
+*/
