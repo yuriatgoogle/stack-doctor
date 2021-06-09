@@ -64,27 +64,3 @@ func main() {
 		http.ListenAndServe(":8081", r)
 	}
 }
-
-/* this works
-func main() {
-	shutdown := initTracer()
-	defer shutdown()
-
-	helloHandler := func(w http.ResponseWriter, req *http.Request) {
-		ctx := req.Context()
-		span := trace.SpanFromContext(ctx)
-		span.AddEvent("handling incoming request")
-
-		fmt.Printf("OK")
-	}
-
-	otelHandler := otelhttp.NewHandler(http.HandlerFunc(helloHandler), "Backend span")
-
-	http.Handle("/", otelHandler)
-	if env == "LOCAL" {
-		http.ListenAndServe("localhost:8081", nil)
-	} else {
-		http.ListenAndServe(":8081", nil)
-	}
-}
-*/
