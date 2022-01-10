@@ -1,0 +1,22 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: o11y-demo-frontend
+  labels:
+    app: o11y-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: o11y-demo
+  template:
+    metadata:
+      labels:
+        app: o11y-demo
+    spec:
+      containers:
+        - name: frontend
+          image: gcr.io/ergc-demo/frontend:latest
+          ports:
+            - containerPort: 8080
