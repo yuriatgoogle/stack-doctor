@@ -1,4 +1,5 @@
 from flask import Flask
+import requests
 from prometheus_flask_exporter import PrometheusMetrics as prom_metrics
 
 # OpenTelemetry Metrics
@@ -47,10 +48,20 @@ tracer = trace.get_tracer(__name__)
 @ app.route('/')
 @ metrics.counter('frontend_request_count_prom', 'Number of requests counted by Prom', labels={})
 def index():
-    with tracer.start_span("parent_span") as current_span:
-        otel_requests_counter.add(1, metric_labels)
-        # TODO - add random delay to make traces more interesting
-        return 'Hello world!'
+    with tracer.start_as_current_span("complete_transaction") as link_target:
+        with tracer.start_as_current_span("link_span", links=[Link(link_target.context)]):
+            # cound request
+            otel_requests_counter.add(1, metric_labels)
+            # add event for external request
+            with tracer.start_as_current_span(
+                "external_request",
+                links=[Link(link_target.context, attributes={})],
+            ):
+                # make external request
+                link_target.add_event(name="start external request")
+                r = requests.get('https://www.google.com')
+                link_target.add_event(name="complete external request")
+                return 'Response from backend: ' + str(r.status_code)
 
 
 app.run(host='0.0.0.0', port=8080)

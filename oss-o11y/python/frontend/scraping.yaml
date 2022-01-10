@@ -23,5 +23,5 @@ spec:
     matchLabels:
       app: o11y-demo
   endpoints:
-    - port: metrics
+    - port: 8080
       interval: 30s
