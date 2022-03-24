@@ -1,0 +1,62 @@
+                          
+2022/03/24 14:39:10 maxprocs: Leaving GOMAXPROCS=16: CPU quota undefined
+{"level":"info","ts":1648157950.301789,"caller":"flags/service.go:117","msg":"Mounting metrics handler on admin server","route":"/metrics"}
+{"level":"info","ts":1648157950.301843,"caller":"flags/service.go:123","msg":"Mounting expvar handler on admin server","route":"/debug/vars"}
+{"level":"info","ts":1648157950.302144,"caller":"flags/admin.go:104","msg":"Mounting health check on admin server","route":"/"}
+{"level":"info","ts":1648157950.3021922,"caller":"flags/admin.go:115","msg":"Starting admin HTTP server","http-addr":":14269"}
+{"level":"info","ts":1648157950.302207,"caller":"flags/admin.go:96","msg":"Admin server started","http.host-port":"[::]:14269","health-status":"unavailable"}
+{"level":"info","ts":1648157950.303482,"caller":"memory/factory.go:63","msg":"Memory storage initialized","configuration":{"MaxTraces":0}}
+{"level":"info","ts":1648157950.3037922,"caller":"static/strategy_store.go:203","msg":"No sampling strategies provided or URL is unavailable, using defaults"}
+{"level":"info","ts":1648157950.31109,"caller":"server/grpc.go:95","msg":"Starting jaeger-collector gRPC server","grpc.host-port":"[::]:14250"}
+{"level":"info","ts":1648157950.311142,"caller":"server/http.go:48","msg":"Starting jaeger-collector HTTP server","http host-port":":14268"}
+{"level":"info","ts":1648157950.3113081,"caller":"server/zipkin.go:49","msg":"Not listening for Zipkin HTTP traffic, port not configured"}
+{"level":"info","ts":1648157950.311331,"caller":"grpc/builder.go:71","msg":"Agent requested insecure grpc connection to collector(s)"}
+{"level":"info","ts":1648157950.311379,"caller":"channelz/logging.go:50","msg":"[core]original dial target is: \":14250\"","system":"grpc","grpc_log":true}
+{"level":"info","ts":1648157950.311408,"caller":"channelz/logging.go:50","msg":"[core]dial target \":14250\" parse failed: parse \":14250\": missing protocol scheme","system":"grpc","grpc_log":true}
+{"level":"info","ts":1648157950.311414,"caller":"channelz/logging.go:50","msg":"[core]fallback to scheme \"passthrough\"","system":"grpc","grpc_log":true}
+{"level":"info","ts":1648157950.311649,"caller":"channelz/logging.go:50","msg":"[core]parsed dial target is: {Scheme:passthrough Authority: Endpoint::14250 URL:{Scheme:passthrough Opaque: User: Host: Path:/:14250 RawPath: ForceQuery:false RawQuery: Fragment: RawFragment:}}","system":"grpc","grpc_log":true}
+{"level":"info","ts":1648157950.3116832,"caller":"channelz/logging.go:50","msg":"[core]Channel authority set to \"localhost:14250\"","system":"grpc","grpc_log":true}
+{"level":"info","ts":1648157950.311714,"caller":"channelz/logging.go:50","msg":"[core]ccResolverWrapper: sending update to cc: {[{:14250  <nil> <nil> 0 <nil>}] <nil> <nil>}","system":"grpc","grpc_log":true}
+{"level":"info","ts":1648157950.311734,"caller":"channelz/logging.go:50","msg":"[core]ClientConn switching balancer to \"round_robin\"","system":"grpc","grpc_log":true}
+{"level":"info","ts":1648157950.3117492,"caller":"channelz/logging.go:50","msg":"[core]Channel switches to new LB policy \"round_robin\"","system":"grpc","grpc_log":true}
+{"level":"info","ts":1648157950.311779,"caller":"grpclog/component.go:55","msg":"[balancer]base.baseBalancer: got new ClientConn state: {{[{:14250  <nil> <nil> 0 <nil>}] <nil> <nil>} <nil>}","system":"grpc","grpc_log":true}
+{"level":"info","ts":1648157950.311938,"caller":"channelz/logging.go:50","msg":"[core]Subchannel Connectivity change to CONNECTING","system":"grpc","grpc_log":true}
+{"level":"info","ts":1648157950.311929,"caller":"grpc/builder.go:110","msg":"Checking connection to collector"}
+{"level":"info","ts":1648157950.311994,"caller":"channelz/logging.go:50","msg":"[core]Subchannel picks a new address \":14250\" to connect","system":"grpc","grpc_log":true}
+{"level":"info","ts":1648157950.3120499,"caller":"grpc/builder.go:121","msg":"Agent collector connection state change","dialTarget":":14250","status":"IDLE"}
+{"level":"info","ts":1648157950.312106,"caller":"grpclog/component.go:71","msg":"[balancer]base.baseBalancer: handle SubConn state change: 0xc000a8a9a0, CONNECTING","system":"grpc","grpc_log":true}
+{"level":"info","ts":1648157950.312153,"caller":"channelz/logging.go:50","msg":"[core]Channel Connectivity change to CONNECTING","system":"grpc","grpc_log":true}
+{"level":"info","ts":1648157950.312259,"caller":"grpc/builder.go:121","msg":"Agent collector connection state change","dialTarget":":14250","status":"CONNECTING"}
+{"level":"info","ts":1648157950.312656,"caller":"channelz/logging.go:50","msg":"[core]Subchannel Connectivity change to READY","system":"grpc","grpc_log":true}
+{"level":"info","ts":1648157950.312696,"caller":"grpclog/component.go:71","msg":"[balancer]base.baseBalancer: handle SubConn state change: 0xc000a8a9a0, READY","system":"grpc","grpc_log":true}
+{"level":"info","ts":1648157950.31274,"caller":"grpclog/component.go:71","msg":"[roundrobin]roundrobinPicker: Build called with info: {map[0xc000a8a9a0:{{:14250  <nil> <nil> 0 <nil>}}]}","system":"grpc","grpc_log":true}
+{"level":"info","ts":1648157950.312751,"caller":"channelz/logging.go:50","msg":"[core]Channel Connectivity change to READY","system":"grpc","grpc_log":true}
+{"level":"info","ts":1648157950.312759,"caller":"grpc/builder.go:121","msg":"Agent collector connection state change","dialTarget":":14250","status":"READY"}
+{"level":"info","ts":1648157950.31279,"caller":"./main.go:243","msg":"Starting agent"}
+{"level":"info","ts":1648157950.3128572,"caller":"querysvc/query_service.go:137","msg":"Archive storage not created","reason":"archive storage not supported"}
+{"level":"info","ts":1648157950.312872,"caller":"app/flags.go:124","msg":"Archive storage not initialized"}
+{"level":"info","ts":1648157950.312879,"caller":"app/agent.go:69","msg":"Starting jaeger-agent HTTP server","http-port":5778}
+{"level":"info","ts":1648157950.313044,"caller":"channelz/logging.go:50","msg":"[core]original dial target is: \":16685\"","system":"grpc","grpc_log":true}
+{"level":"info","ts":1648157950.313059,"caller":"channelz/logging.go:50","msg":"[core]dial target \":16685\" parse failed: parse \":16685\": missing protocol scheme","system":"grpc","grpc_log":true}
+{"level":"info","ts":1648157950.313065,"caller":"channelz/logging.go:50","msg":"[core]fallback to scheme \"passthrough\"","system":"grpc","grpc_log":true}
+{"level":"info","ts":1648157950.3130822,"caller":"channelz/logging.go:50","msg":"[core]parsed dial target is: {Scheme:passthrough Authority: Endpoint::16685 URL:{Scheme:passthrough Opaque: User: Host: Path:/:16685 RawPath: ForceQuery:false RawQuery: Fragment: RawFragment:}}","system":"grpc","grpc_log":true}
+{"level":"info","ts":1648157950.31309,"caller":"channelz/logging.go:50","msg":"[core]Channel authority set to \"localhost:16685\"","system":"grpc","grpc_log":true}
+{"level":"info","ts":1648157950.313099,"caller":"channelz/logging.go:50","msg":"[core]ccResolverWrapper: sending update to cc: {[{:16685  <nil> <nil> 0 <nil>}] <nil> <nil>}","system":"grpc","grpc_log":true}
+{"level":"info","ts":1648157950.3131058,"caller":"channelz/logging.go:50","msg":"[core]ClientConn switching balancer to \"pick_first\"","system":"grpc","grpc_log":true}
+{"level":"info","ts":1648157950.313111,"caller":"channelz/logging.go:50","msg":"[core]Channel switches to new LB policy \"pick_first\"","system":"grpc","grpc_log":true}
+{"level":"info","ts":1648157950.3131468,"caller":"channelz/logging.go:50","msg":"[core]Subchannel Connectivity change to CONNECTING","system":"grpc","grpc_log":true}
+{"level":"info","ts":1648157950.313161,"caller":"channelz/logging.go:50","msg":"[core]Subchannel picks a new address \":16685\" to connect","system":"grpc","grpc_log":true}
+{"level":"info","ts":1648157950.313201,"caller":"grpclog/component.go:71","msg":"[core]pickfirstBalancer: UpdateSubConnState: 0xc0006b1f50, {CONNECTING <nil>}","system":"grpc","grpc_log":true}
+{"level":"info","ts":1648157950.3132238,"caller":"channelz/logging.go:50","msg":"[core]Channel Connectivity change to CONNECTING","system":"grpc","grpc_log":true}
+{"level":"warn","ts":1648157950.313333,"caller":"channelz/logging.go:75","msg":"[core]grpc: addrConn.createTransport failed to connect to {:16685 localhost:16685 <nil> <nil> 0 <nil>}. Err: connection error: desc = \"transport: Error while dialing dial tcp :16685: connect: connection refused\"","system":"grpc","grpc_log":true}
+{"level":"info","ts":1648157950.313353,"caller":"channelz/logging.go:50","msg":"[core]Subchannel Connectivity change to TRANSIENT_FAILURE","system":"grpc","grpc_log":true}
+{"level":"info","ts":1648157950.313389,"caller":"grpclog/component.go:71","msg":"[core]pickfirstBalancer: UpdateSubConnState: 0xc0006b1f50, {TRANSIENT_FAILURE connection error: desc = \"transport: Error while dialing dial tcp :16685: connect: connection refused\"}","system":"grpc","grpc_log":true}
+{"level":"info","ts":1648157950.313397,"caller":"channelz/logging.go:50","msg":"[core]Channel Connectivity change to TRANSIENT_FAILURE","system":"grpc","grpc_log":true}
+{"level":"info","ts":1648157950.313419,"caller":"app/static_handler.go:182","msg":"UI config path not provided, config file will not be watched"}
+{"level":"info","ts":1648157950.3135319,"caller":"app/server.go:200","msg":"Query server started","http_addr":"[::]:16686","grpc_addr":"[::]:16685"}
+{"level":"info","ts":1648157950.313549,"caller":"healthcheck/handler.go:129","msg":"Health Check state change","status":"ready"}
+{"level":"info","ts":1648157950.313565,"caller":"app/server.go:264","msg":"Starting HTTP server","port":16686,"addr":":16686"}
+{"level":"info","ts":1648157950.313577,"caller":"app/server.go:283","msg":"Starting GRPC server","port":16685,"addr":":16685"}
+{"level":"info","ts":1648157951.3134131,"caller":"channelz/logging.go:50","msg":"[core]Subchannel Connectivity change to IDLE","system":"grpc","grpc_log":true}
+{"level":"info","ts":1648157951.313461,"caller":"grpclog/component.go:71","msg":"[core]pickfirstBalancer: UpdateSubConnState: 0xc0006b1f50, {IDLE connection error: desc = \"transport: Error while dialing dial tcp :16685: connect: connection refused\"}","system":"grpc","grpc_log":true}
+{"level":"info","ts":1648157951.3134751,"caller":"channelz/logging.go:50","msg":"[core]Channel Connectivity change to IDLE","system":"grpc","grpc_log":true}
