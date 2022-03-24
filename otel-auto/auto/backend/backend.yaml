@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auto-backend
+  labels:
+    app: auto-backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: auto-backend
+  template:
+    metadata:
+      labels:
+        app: auto-backend
+    spec:
+      containers:
+      - name: auto-backend
+        image: gcr.io/thegrinch-demos/auto-backend:latest
+        imagePullPolicy: Always
+        ports:
+            - containerPort: 8081
+        env:
+          - name: OTEL_EXPORTER_JAEGER_ENDPOINT
+            value: http://10.64.7.204:9411
+          - name: OTEL_PROPAGATORS
+            value: jaeger,tracecontext,baggage

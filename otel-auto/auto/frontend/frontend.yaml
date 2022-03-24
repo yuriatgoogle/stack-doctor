@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auto-frontend
+  labels:
+    app: auto-frontend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: auto-frontend
+  template:
+    metadata:
+      labels:
+        app: auto-frontend
+    spec:
+      containers:
+      - name: auto-frontend
+        image: gcr.io/thegrinch-demos/auto-frontend:latest
+        imagePullPolicy: Always
+        ports:
+            - containerPort: 8080
+        env:
+          - name: OTEL_EXPORTER_JAEGER_ENDPOINT
+            value: jaeger.svc.observability.cluster.local:9411
+          - name: OTEL_PROPAGATORS
+            value: jaeger
+          - name: BACKEND
+            value: http://auto-backend:8081

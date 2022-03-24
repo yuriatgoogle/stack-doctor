@@ -13,4 +13,4 @@ RUN pip install -r requirements.txt
 # copy every content from the local file to the image
 COPY . /app
 
-CMD [ "opentelemetry-instrument", "--traces_exporter" , "jaeger_proto", "python", "frontend.py"]
+CMD [ "opentelemetry-instrument", "--traces_exporter" , "jaeger_proto", "python", "backend.py"]
