@@ -33,7 +33,7 @@ backend_addr = os.getenv('BACKEND')
 
 app = Flask(__name__)
 
-@ app.route('/')
+@app.route('/')
 def index():
     start = time.time()
     r = requests.get(backend_addr)
