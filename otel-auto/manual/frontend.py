@@ -6,18 +6,21 @@ import time
 import os
 
 from opentelemetry import trace, baggage
-from opentelemetry.trace import Link
-from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
+from opentelemetry.trace import SpanContext, NonRecordingSpan
 from opentelemetry.exporter.cloud_trace import CloudTraceSpanExporter
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
-from opentelemetry.propagate import set_global_textmap
+from opentelemetry.propagate import set_global_textmap, inject
 from opentelemetry.propagators.cloud_trace_propagator import (
     CloudTraceFormatPropagator,
 )
-
 set_global_textmap(CloudTraceFormatPropagator())
+
+def set_span_context_headers():
+  headers = {}
+  inject(headers)
+  return headers
 
 tracer_provider = TracerProvider()
 cloud_trace_exporter = CloudTraceSpanExporter()
@@ -35,8 +38,9 @@ backend_addr = os.getenv('BACKEND')
 def index():
     with tracer.start_as_current_span("Root span") as parent:
         start = time.time()
-        with tracer.start_as_current_span(name="Backend request", links=[Link(parent.context)]) as child:
-            r = requests.get(backend_addr, timeout=3)
+        with tracer.start_as_current_span(name="Backend request") as child:
+            headers = set_span_context_headers()
+            r = requests.get(backend_addr, timeout=3, headers=headers)
             latency = time.time() - start
             return 'Response from backend: ' + str(r.status_code) + ' in ' + str(round(latency, 3) * 1000) + ' ms'
 

@@ -1,28 +1,22 @@
-from multiprocessing import context, get_context
-from flask import Flask
+from flask import Flask, request
 import requests
 import time
 import os
 from random import randint
 from time import sleep
 
-
 from opentelemetry import trace, baggage
 from opentelemetry.exporter.cloud_trace import CloudTraceSpanExporter
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
-from opentelemetry.trace import Link, propagation
 
-from opentelemetry.propagate import set_global_textmap
+from opentelemetry.propagate import set_global_textmap, extract
+
+from opentelemetry.trace import SpanContext, NonRecordingSpan
+
 from opentelemetry.propagators.cloud_trace_propagator import (
     CloudTraceFormatPropagator,
 )
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor
-from opentelemetry.context.context import Context
-from opentelemetry.trace.propagation.tracecontext import \
-    TraceContextTextMapPropagator
-
 set_global_textmap(CloudTraceFormatPropagator())
 
 tracer_provider = TracerProvider()
@@ -38,7 +32,10 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    with tracer.start_as_current_span("Backend process", context=app.app_context()) as backend_span:
+    # get incoming context from headers
+    ctx = extract(request.headers)
+    print(ctx)
+    with tracer.start_as_current_span("backend process", context=ctx) as span:
         start = time.time()
         sleep(randint(1,1000)/1000)
         latency = time.time() - start
