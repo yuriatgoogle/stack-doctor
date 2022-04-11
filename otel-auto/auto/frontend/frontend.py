@@ -3,7 +3,7 @@ import requests
 import time
 import os
 
-backend_addr = os.getenv('BACKEND')
+backend_addr = 'http://localhost:8081'
 
 app = Flask(__name__)
 

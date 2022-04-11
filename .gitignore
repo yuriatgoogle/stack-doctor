@@ -9,6 +9,7 @@ main
 *.tfstate
 *.backup
 scratch.sh
+application_default_credentials.json
 
 # Local .terraform directories
 **/.terraform/*
