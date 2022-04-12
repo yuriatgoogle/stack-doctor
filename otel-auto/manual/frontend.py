@@ -37,7 +37,7 @@ backend_addr = os.getenv('BACKEND')
 def index():
     with tracer.start_as_current_span("Root span") as parent:
         start = time.time()
-        with tracer.start_as_current_span(name="Backend request") as child:
+        with tracer.start_as_current_span("Backend request") as child:
             headers = set_span_context_headers()
             r = requests.get(backend_addr, timeout=3, headers=headers)
             latency = time.time() - start
