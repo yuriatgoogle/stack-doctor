@@ -31,13 +31,13 @@ trace.set_tracer_provider(tracer_provider)
 tracer = trace.get_tracer(__name__)
 
 app = Flask(__name__)
-backend_addr = os.getenv('BACKEND')
+backend_addr = 'http://localhost:8081'
 
 @app.route('/')
 def index():
     with tracer.start_as_current_span("Root span") as parent:
         start = time.time()
-        with tracer.start_as_current_span(name="Backend request") as child:
+        with tracer.start_as_current_span("Backend request") as child:
             headers = set_span_context_headers()
             r = requests.get(backend_addr, timeout=3, headers=headers)
             latency = time.time() - start
