@@ -1,0 +1,25 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+processors:
+  batch:
+
+extensions:
+  zpages:
+
+
+exporters:
+  googlecloud:
+    project: thegrinch-demos
+
+service:
+  extensions: [zpages]
+
+  pipelines:
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [googlecloud]
