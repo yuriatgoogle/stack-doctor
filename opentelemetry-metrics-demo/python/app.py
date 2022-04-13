@@ -12,7 +12,7 @@ from opentelemetry.sdk._metrics.export import PeriodicExportingMetricReader
 
 meter = get_meter_provider().get_meter("getting-started")
 metric_exporter = OTLPMetricExporter(
-    # endpoint:="localhost:55678",
+    # endpoint:="localhost:4317",
     # credentials=ChannelCredentials(credentials),
     # headers=(("metadata", "metadata")),
 )
