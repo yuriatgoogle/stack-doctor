@@ -16,7 +16,7 @@ spec:
       - name: otelcol
         args:
         - --config=/conf/collector.yaml
-        image: otel/opentelemetry-collector-contrib
+        image: otel/opentelemetry-collector-contrib:0.49.0
         volumeMounts:
         - mountPath: /conf
           name: collector-config

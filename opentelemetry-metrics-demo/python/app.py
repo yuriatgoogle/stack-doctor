@@ -22,7 +22,7 @@ set_meter_provider(provider)
 
 requests_counter = meter.create_counter("otel_total_requests")
 errors_counter = meter.create_counter("otel_failed_requests")
-# request_latency = meter.create_valuerecorder("otel_request_latency")
+request_latency = meter.create_histogram("otel_request_latency")
 
 labels = {}
 app = Flask(__name__)
@@ -36,9 +36,9 @@ def index():
     if randint(1,100) > 95:
         # fail 5 % of the time
         errors_counter.add(1)
-        # request_latency.record(latency)
+        request_latency.record(latency)
         return 'Processing failed!', 500
-    # request_latency.record(latency, labels=labels)
+    request_latency.record(latency)
     return 'returned in ' + str(round(latency, 3) * 1000) + ' ms', 200
     
 app.run(host='0.0.0.0', port=8080)
