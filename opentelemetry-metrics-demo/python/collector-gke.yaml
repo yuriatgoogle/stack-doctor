@@ -14,9 +14,8 @@ spec:
     spec:
       containers:
       - name: otelcol
-        args:
-        - --config=/conf/collector.yaml
-        image: otel/opentelemetry-collector-contrib:0.49.0
+        args: ["--config=/conf/collector.yaml", "--feature-gates=exporter.googlecloud.OTLPDirect"]
+        image: otel/opentelemetry-collector-contrib-dev:60b9ca3a2bb25a9de50f2831a29a67a0827693b5
         volumeMounts:
         - mountPath: /conf
           name: collector-config

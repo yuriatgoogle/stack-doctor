@@ -3,11 +3,13 @@ import time
 import os
 from random import randint
 from time import sleep
+import socket
 
 from opentelemetry._metrics import get_meter_provider, set_meter_provider
 from opentelemetry.exporter.otlp.proto.grpc._metric_exporter import OTLPMetricExporter
 from opentelemetry.sdk._metrics import MeterProvider
 from opentelemetry.sdk._metrics.export import PeriodicExportingMetricReader
+from opentelemetry.sdk.resources import Resource
 
 meter = get_meter_provider().get_meter("getting-started")
 metric_exporter = OTLPMetricExporter(
@@ -17,7 +19,11 @@ metric_exporter = OTLPMetricExporter(
     # headers=(("metadata", "metadata")),
 )
 reader = PeriodicExportingMetricReader(metric_exporter)
-provider = MeterProvider(metric_readers=[reader])
+provider = MeterProvider(metric_readers=[reader],
+                        resource=Resource.create({
+                                "service.name": "otel-metrics-demo",
+                                "service.instance.id": socket.gethostname(),
+                            }))
 set_meter_provider(provider)
 
 requests_counter = meter.create_counter("otel_total_requests")
