@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: traffic-otel-metrics
+  name: traffic-otel-metrics
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: traffic-otel-metrics
+  template:
+    metadata:
+      labels:
+        app: traffic-otel-metrics
+    spec:
+      containers:
+      - args:
+        - -c
+        - apt-get update;apt-get install -y curl; while true; do curl -s http://10.64.14.197:8080
+          >> /dev/null; sleep 1;done
+        command:
+        - /bin/sh
+        image: debian
+        imagePullPolicy: Always
+        name: traffic-otel-metrics
+        ports:
+        - containerPort: 80

@@ -1,16 +1,21 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: otel-metrics
+  labels:
+    app: otel-metrics
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
-      run: otel-metrics
+      app: otel-metrics
   template:
+    metadata:
+      labels:
+        app: otel-metrics
     spec:
       containers:
-      - image: gcr.io/thegrinch-demos/otel-metrics:latest
-        imagePullPolicy: Always
-        name: otel-metrics
-        port: 8080
+      - name: otel-metrics-server
+        image: gcr.io/thegrinch-demos/otel-metrics:latest
+        ports:
+        - containerPort: 8080

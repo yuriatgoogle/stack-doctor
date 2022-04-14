@@ -1,5 +1,5 @@
 # start by pulling the python image
-FROM python:3.9-alpine
+FROM python:3.9.12
 
 # copy the requirements file into the image
 COPY ./requirements.txt /app/requirements.txt
@@ -7,8 +7,6 @@ COPY ./requirements.txt /app/requirements.txt
 # switch working directory
 WORKDIR /app
 
-# install build 
-RUN apk add g++
 # install the dependencies and packages in the requirements file
 RUN pip install -r requirements.txt
 

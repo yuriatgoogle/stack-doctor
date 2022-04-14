@@ -5,9 +5,9 @@ metadata:
 spec:
   ports:
   - name: grpc-otlp
-    port: 55681
+    port: 4317
     protocol: TCP
-    targetPort: 55681
+    targetPort: 4317
   selector:
     app.kubernetes.io/name: opentelemetrycollector
   type: ClusterIP

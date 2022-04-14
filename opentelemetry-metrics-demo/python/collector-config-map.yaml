@@ -19,3 +19,25 @@ data:
           receivers: [otlp]
           processors: [batch]
           exporters: [googlecloud]
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agent-config
+data:
+  agent.yaml: |
+    receivers:
+      otlp:
+        protocols: 
+          grpc:
+    processors:
+    exporters:
+      otlp:
+        endpoint: "opentelemetrycollector.metrics-demo.svc.cluster.local:4317"
+        insecure: true
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: []
+          exporters: [otlp]
