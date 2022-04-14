@@ -4,7 +4,6 @@ import os
 from random import randint
 from time import sleep
 
-
 from opentelemetry._metrics import get_meter_provider, set_meter_provider
 from opentelemetry.exporter.otlp.proto.grpc._metric_exporter import OTLPMetricExporter
 from opentelemetry.sdk._metrics import MeterProvider
