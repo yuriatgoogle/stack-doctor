@@ -3,6 +3,7 @@ certifi==2021.10.8
 charset-normalizer==2.0.12
 click==8.1.2
 Deprecated==1.2.13
+environs==9.5.0
 Flask==2.1.1
 googleapis-common-protos==1.56.0
 grpcio==1.44.0
@@ -11,14 +12,19 @@ importlib-metadata==4.11.3
 itsdangerous==2.1.2
 Jinja2==3.1.1
 MarkupSafe==2.1.1
+marshmallow==3.15.0
 opentelemetry-api==1.10.0
 opentelemetry-exporter-otlp==1.10.0
 opentelemetry-exporter-otlp-proto-grpc==1.10.0
 opentelemetry-exporter-otlp-proto-http==1.10.0
+opentelemetry-propagator-b3==1.7.1
 opentelemetry-proto==1.10.0
 opentelemetry-sdk==1.10.0
 opentelemetry-semantic-conventions==0.29b0
+packaging==21.3
 protobuf==3.20.0
+pyparsing==3.0.8
+python-dotenv==0.20.0
 requests==2.27.1
 six==1.16.0
 typing_extensions==4.1.1
