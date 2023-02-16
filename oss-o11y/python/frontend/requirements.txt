@@ -1,7 +1,7 @@
 appdirs==1.4.4
 argcomplete==1.12.2
 cachetools==4.2.4
-certifi==2021.10.8
+certifi==2022.12.7
 charset-normalizer==2.0.10
 click==7.1.2
 colorlog==4.7.2
