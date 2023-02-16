@@ -43,4 +43,4 @@ rsa==4.8
 six==1.15.0
 urllib3==1.26.8
 virtualenv==20.4.2
-Werkzeug==1.0.1
+Werkzeug==2.2.3
